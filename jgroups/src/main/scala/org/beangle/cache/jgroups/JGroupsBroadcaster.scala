@@ -64,7 +64,7 @@ class JGroupsBroadcaster(channelName: String, channel: JChannel, serializer: Bin
 
   override def publishEviction(cache: String, key: Any): Unit = {
     try {
-      channel.send(new Message(null, null, serializer.serialize(new EvictMessage(cache, key), Map.empty)))
+      channel.send(new Message(null, serializer.serialize(new EvictMessage(cache, key), Map.empty)))
     } catch {
       case e: Throwable =>
         logger.error("Unable to evict,cache=" + cache + " key=" + key, e);
@@ -73,7 +73,7 @@ class JGroupsBroadcaster(channelName: String, channel: JChannel, serializer: Bin
 
   override def publishClear(cache: String): Unit = {
     try {
-      channel.send(new Message(null, null, serializer.serialize(new EvictMessage(cache, null), Map.empty)))
+      channel.send(new Message(null, serializer.serialize(new EvictMessage(cache, null), Map.empty)))
     } catch {
       case e: Throwable =>
         logger.error("Unable to clear cache :" + cache, e);
