@@ -20,19 +20,22 @@ package org.beangle.cache.ehcache
 
 import org.ehcache.event.{ CacheEvent, CacheEventListener, EventType }
 import org.beangle.cache.Cache
+import org.beangle.cache.Broadcaster
+
 /**
  * @author chaostone
  */
 object Listener {
 
-  class EvictionBroadcaster(broadcaster: org.beangle.cache.Broadcaster, cacheName: String) extends CacheEventListener[Any, Any] {
-    override def onEvent(event: CacheEvent[Any, Any]): Unit = {
+  class EvictionBroadcaster(broadcaster: Broadcaster, cacheName: String)
+      extends CacheEventListener[Any, Any] {
+    override def onEvent(event: CacheEvent[_, _]): Unit = {
       broadcaster.publishEviction(cacheName, event.getKey)
     }
   }
 
   class ChainExpiry(target: Cache[Any, Any]) extends CacheEventListener[Any, Any] {
-    override def onEvent(event: CacheEvent[Any, Any]): Unit = {
+    override def onEvent(event: CacheEvent[_, _]): Unit = {
       target.evict(event.getKey)
     }
   }
