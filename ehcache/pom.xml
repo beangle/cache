@@ -9,7 +9,7 @@
   <groupId>org.beangle.cache</groupId>
   <artifactId>beangle-cache-ehcache_2.12</artifactId>
   <packaging>jar</packaging>
-  <name>Beangle Cache Ehache</name>
+  <name>Beangle Cache Ehcache</name>
 
   <properties>
     <bundle.symbolicName>org.beangle.cache.ehcache</bundle.symbolicName>

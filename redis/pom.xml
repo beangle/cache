@@ -25,13 +25,11 @@
       <groupId>redis.clients</groupId>
       <artifactId>jedis</artifactId>
       <version>${jedis.version}</version>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>de.ruedigermoeller</groupId>
       <artifactId>fst</artifactId>
       <version>${fst.version}</version>
-      <optional>true</optional>
     </dependency>
   </dependencies>
 
