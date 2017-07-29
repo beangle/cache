@@ -43,7 +43,6 @@
     <caffeine.version>2.5.3</caffeine.version>
     <jedis.version>2.9.0</jedis.version>
     <jgroups.version>4.0.4.Final</jgroups.version>
-    <fst.version>2.51</fst.version>
   </properties>
 
   <dependencyManagement>
