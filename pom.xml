@@ -8,7 +8,7 @@
   <groupId>org.beangle.cache</groupId>
   <artifactId>beangle-cache-parent_2.12</artifactId>
   <packaging>pom</packaging>
-  <version>0.0.6-SNAPSHOT</version>
+  <version>0.0.6</version>
   <name>Beangle Cache Parent</name>
 
   <modules>
@@ -43,7 +43,6 @@
     <caffeine.version>2.5.3</caffeine.version>
     <jedis.version>2.9.0</jedis.version>
     <jgroups.version>4.0.4.Final</jgroups.version>
-    <fst.version>2.51</fst.version>
   </properties>
 
   <dependencyManagement>

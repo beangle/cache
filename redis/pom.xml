@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.beangle.cache</groupId>
     <artifactId>beangle-cache-parent_2.12</artifactId>
-    <version>0.0.6-SNAPSHOT</version>
+    <version>0.0.6</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.beangle.cache</groupId>
@@ -25,11 +25,6 @@
       <groupId>redis.clients</groupId>
       <artifactId>jedis</artifactId>
       <version>${jedis.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>de.ruedigermoeller</groupId>
-      <artifactId>fst</artifactId>
-      <version>${fst.version}</version>
     </dependency>
   </dependencies>
 
