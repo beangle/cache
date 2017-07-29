@@ -21,7 +21,6 @@ package org.beangle.cache.caffeine
 import org.beangle.cache.Cache
 
 import com.github.benmanes.caffeine.cache.{ Cache => CCache }
-import org.beangle.commons.lang.annotation.value
 import org.beangle.commons.lang.Objects
 import java.util.concurrent.TimeUnit
 

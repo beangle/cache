@@ -3,13 +3,13 @@
   <parent>
     <groupId>org.beangle.cache</groupId>
     <artifactId>beangle-cache-parent_2.12</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.beangle.cache</groupId>
   <artifactId>beangle-cache-ehcache_2.12</artifactId>
   <packaging>jar</packaging>
-  <name>Beangle Cache Ehache</name>
+  <name>Beangle Cache Ehcache</name>
 
   <properties>
     <bundle.symbolicName>org.beangle.cache.ehcache</bundle.symbolicName>
