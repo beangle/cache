@@ -72,6 +72,21 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     }
   }
 
+  override def putIfAbsent(key: K, value: V): Boolean = {
+    val cache = pool.getResource
+    try {
+      val redisKey = buildKey(name, key).getBytes
+      if (ttl > 0) {
+        cache.set(redisKey, serializer.serialize(value, Map.empty), NX, EX, ttl) == "OK"
+      } else {
+        cache.set(redisKey, serializer.serialize(value, Map.empty), NX) == "OK"
+      }
+      false
+    } finally {
+      cache.close()
+    }
+  }
+
   override def touch(key: K): Boolean = {
     val cache = pool.getResource
     try {
@@ -123,21 +138,6 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     val cache = pool.getResource
     try {
       cache.exists(buildKey(name, key).getBytes)
-    } finally {
-      cache.close()
-    }
-  }
-
-  override def putIfAbsent(key: K, value: V): Boolean = {
-    val cache = pool.getResource
-    try {
-      val redisKey = buildKey(name, key).getBytes
-      if (ttl > 0) {
-        cache.set(redisKey, serializer.serialize(value, Map.empty), NX, EX, ttl) == "OK"
-      } else {
-        cache.set(redisKey, serializer.serialize(value, Map.empty), NX) == "OK"
-      }
-      false
     } finally {
       cache.close()
     }

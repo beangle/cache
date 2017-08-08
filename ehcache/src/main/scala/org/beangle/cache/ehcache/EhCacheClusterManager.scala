@@ -28,6 +28,7 @@ import org.ehcache.config.builders.CacheEventListenerConfigurationBuilder
 
 /**
  * @author chaostone
+ * Cluster many ehcache using broadcaster
  */
 class EhCacheClusterManager(ehManager: EhCacheManager, broadcasterBuilder: BroadcasterBuilder, autoCreate: Boolean)
     extends AbstractCacheManager(autoCreate) with Initializing {
@@ -45,7 +46,7 @@ class EhCacheClusterManager(ehManager: EhCacheManager, broadcasterBuilder: Broad
     if (null == c) {
       var builder = ehManager.getConfigBuilder(name + ".Template", keyType, valueType)
       val eventTypes = new java.util.HashSet[EventType]
-      eventTypes.addAll(java.util.Arrays.asList(EventType.values(): _*))
+      eventTypes.addAll(java.util.Arrays.asList(EventType.values: _*))
       if (!propagateExpiration) eventTypes.remove(EventType.EXPIRED)
 
       val broadcasterConfig = CacheEventListenerConfigurationBuilder

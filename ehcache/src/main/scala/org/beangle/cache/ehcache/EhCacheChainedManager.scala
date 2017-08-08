@@ -62,7 +62,7 @@ class EhCacheChainedManager(ehManager: EhCacheManager, targetManager: CacheManag
 
       if (null != broadcaster) {
         val eventTypes = new java.util.HashSet[EventType]
-        eventTypes.addAll(Arrays.asList(EventType.values(): _*))
+        eventTypes.addAll(Arrays.asList(EventType.values: _*))
         if (!propagateExpiration) eventTypes.remove(EventType.EXPIRED)
 
         val broadcasterConfig = CacheEventListenerConfigurationBuilder
@@ -70,7 +70,7 @@ class EhCacheChainedManager(ehManager: EhCacheManager, targetManager: CacheManag
           .unordered().asynchronous().constructedWith(broadcaster, name)
         builder = builder.add(broadcasterConfig)
       }
-      //如果传播过期事件，需要再次构造builder
+      //如果需要传播过期事件，需要再次构造builder
       if (propagateExpiration) {
         val expireListenerConfig = CacheEventListenerConfigurationBuilder
           .newEventListenerConfiguration(classOf[Listener.ChainExpiry], EventType.EXPIRED)
