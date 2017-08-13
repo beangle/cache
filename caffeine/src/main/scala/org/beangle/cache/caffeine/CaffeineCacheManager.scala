@@ -34,7 +34,7 @@ class CaffeineCacheManager(autoCreate: Boolean = false) extends AbstractCacheMan
     case None    => Map.empty[String, String]
   }
 
-  var maximumSize: Int = 10000
+  var maximumSize: Int = 50000
 
   var ttl: Int = 60 * 60
 

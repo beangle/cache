@@ -44,7 +44,7 @@ abstract class AbstractCacheManager(val autoCreate: Boolean) extends CacheManage
               } else {
                 val existed = findCache(name, keyType, valueType).asInstanceOf[Cache[K, V]]
                 if (null != existed) registry += (name -> existed)
-                existed
+                throw new RuntimeException(s"Cannot find cache $name")
               }
           }
         }
