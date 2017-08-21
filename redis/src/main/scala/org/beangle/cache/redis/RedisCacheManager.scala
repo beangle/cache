@@ -47,7 +47,7 @@ class RedisCacheManager(pool: JedisPool, serializer: BinarySerializer, autoCreat
   }
 
   private def registerClass(keyType: Class[_], valueType: Class[_]) {
-    serializer.register(keyType)
-    serializer.register(valueType)
+    serializer.registerClass(keyType)
+    serializer.registerClass(valueType)
   }
 }

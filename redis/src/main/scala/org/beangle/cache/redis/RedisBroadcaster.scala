@@ -91,7 +91,7 @@ class RedisBroadcaster(channel: Array[Byte], pool: JedisPool, serializer: Binary
   }
 
   override def onMessage(channel: Array[Byte], message: Array[Byte]) {
-    val msg = serializer.deserialize(message, Map.empty).asInstanceOf[EvictMessage]
+    val msg = serializer.fromBytes(classOf[EvictMessage], message)
     if (!msg.isIssueByLocal) {
       val cache = localManager.getCache(msg.cache, classOf[Any], classOf[Any])
       if (null != cache) {
@@ -107,7 +107,7 @@ class RedisBroadcaster(channel: Array[Byte], pool: JedisPool, serializer: Binary
   override def publishEviction(cache: String, key: Any): Unit = {
     val jedis = pool.getResource
     try {
-      jedis.publish(channel, serializer.serialize(new EvictMessage(cache, key), Map.empty))
+      jedis.publish(channel, serializer.toBytes(new EvictMessage(cache, key), Map.empty))
     } finally {
       jedis.close()
     }
@@ -116,7 +116,7 @@ class RedisBroadcaster(channel: Array[Byte], pool: JedisPool, serializer: Binary
   override def publishClear(cache: String): Unit = {
     val jedis = pool.getResource
     try {
-      jedis.publish(channel, serializer.serialize(new EvictMessage(cache, null), Map.empty))
+      jedis.publish(channel, serializer.toBytes(new EvictMessage(cache, null), Map.empty))
     } finally {
       jedis.close()
     }
