@@ -52,7 +52,7 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     val cache = pool.getResource
     try {
       val b = cache.get(buildKey(name, key).getBytes)
-      if (b == null) None else Some(serializer.deserialize(b, Map.empty).asInstanceOf[V])
+      if (b == null) None else Some(serializer.fromBytes(classOf[AnyRef], b).asInstanceOf[V])
     } finally {
       cache.close()
     }
@@ -63,9 +63,9 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     try {
       val redisKey = buildKey(name, key).getBytes
       if (ttl > 0) {
-        cache.setex(redisKey, ttl, serializer.serialize(value, Map.empty))
+        cache.setex(redisKey, ttl, serializer.toBytes(value))
       } else {
-        cache.set(redisKey, serializer.serialize(value, Map.empty))
+        cache.set(redisKey, serializer.toBytes(value))
       }
     } finally {
       cache.close()
@@ -77,9 +77,9 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     try {
       val redisKey = buildKey(name, key).getBytes
       if (ttl > 0) {
-        cache.set(redisKey, serializer.serialize(value, Map.empty), NX, EX, ttl) == "OK"
+        cache.set(redisKey, serializer.toBytes(value), NX, EX, ttl) == "OK"
       } else {
-        cache.set(redisKey, serializer.serialize(value, Map.empty), NX) == "OK"
+        cache.set(redisKey, serializer.toBytes(value), NX) == "OK"
       }
       false
     } finally {
@@ -101,13 +101,13 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     try {
       val redisKey = buildKey(name, key).getBytes
       val o = cache.get(redisKey)
-      val newValue = serializer.serialize(value, Map.empty)
+      val newValue = serializer.toBytes(value)
       if (ttl > 0) {
-        cache.setex(redisKey, ttl, serializer.serialize(value, Map.empty))
+        cache.setex(redisKey, ttl, serializer.toBytes(value))
       } else {
-        cache.set(redisKey, serializer.serialize(value, Map.empty))
+        cache.set(redisKey, serializer.toBytes(value))
       }
-      if (o == null) None else Some(serializer.deserialize(o, Map.empty).asInstanceOf[V])
+      if (o == null) None else Some(serializer.toBytes(o).asInstanceOf[V])
     } finally {
       cache.close()
     }
@@ -118,12 +118,12 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     try {
       val redisKey = buildKey(name, key).getBytes
       val o = cache.get(redisKey)
-      if (o != null && o == serializer.serialize(oldvalue, Map.empty)) {
-        val newValue = serializer.serialize(newvalue, Map.empty)
+      if (o != null && o == serializer.toBytes(oldvalue)) {
+        val newValue = serializer.toBytes(newvalue)
         if (ttl > 0) {
-          cache.setex(redisKey, ttl, serializer.serialize(newvalue, Map.empty))
+          cache.setex(redisKey, ttl, serializer.toBytes(newvalue))
         } else {
-          cache.set(redisKey, serializer.serialize(newvalue, Map.empty))
+          cache.set(redisKey, serializer.toBytes(newvalue))
         }
         true
       } else {
