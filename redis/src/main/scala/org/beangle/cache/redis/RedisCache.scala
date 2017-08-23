@@ -52,7 +52,7 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     val cache = pool.getResource
     try {
       val b = cache.get(buildKey(name, key).getBytes)
-      if (b == null) None else Some(serializer.fromBytes(classOf[AnyRef], b).asInstanceOf[V])
+      if (b == null) None else Some(serializer.asObject(classOf[AnyRef], b).asInstanceOf[V])
     } finally {
       cache.close()
     }
@@ -63,9 +63,9 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     try {
       val redisKey = buildKey(name, key).getBytes
       if (ttl > 0) {
-        cache.setex(redisKey, ttl, serializer.toBytes(value))
+        cache.setex(redisKey, ttl, serializer.asBytes(value))
       } else {
-        cache.set(redisKey, serializer.toBytes(value))
+        cache.set(redisKey, serializer.asBytes(value))
       }
     } finally {
       cache.close()
@@ -77,9 +77,9 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     try {
       val redisKey = buildKey(name, key).getBytes
       if (ttl > 0) {
-        cache.set(redisKey, serializer.toBytes(value), NX, EX, ttl) == "OK"
+        cache.set(redisKey, serializer.asBytes(value), NX, EX, ttl) == "OK"
       } else {
-        cache.set(redisKey, serializer.toBytes(value), NX) == "OK"
+        cache.set(redisKey, serializer.asBytes(value), NX) == "OK"
       }
       false
     } finally {
@@ -101,13 +101,13 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     try {
       val redisKey = buildKey(name, key).getBytes
       val o = cache.get(redisKey)
-      val newValue = serializer.toBytes(value)
+      val newValue = serializer.asBytes(value)
       if (ttl > 0) {
-        cache.setex(redisKey, ttl, serializer.toBytes(value))
+        cache.setex(redisKey, ttl, serializer.asBytes(value))
       } else {
-        cache.set(redisKey, serializer.toBytes(value))
+        cache.set(redisKey, serializer.asBytes(value))
       }
-      if (o == null) None else Some(serializer.toBytes(o).asInstanceOf[V])
+      if (o == null) None else Some(serializer.asBytes(o).asInstanceOf[V])
     } finally {
       cache.close()
     }
@@ -118,12 +118,12 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     try {
       val redisKey = buildKey(name, key).getBytes
       val o = cache.get(redisKey)
-      if (o != null && o == serializer.toBytes(oldvalue)) {
-        val newValue = serializer.toBytes(newvalue)
+      if (o != null && o == serializer.asBytes(oldvalue)) {
+        val newValue = serializer.asBytes(newvalue)
         if (ttl > 0) {
-          cache.setex(redisKey, ttl, serializer.toBytes(newvalue))
+          cache.setex(redisKey, ttl, serializer.asBytes(newvalue))
         } else {
-          cache.set(redisKey, serializer.toBytes(newvalue))
+          cache.set(redisKey, serializer.asBytes(newvalue))
         }
         true
       } else {
