@@ -40,7 +40,8 @@ object RedisCache {
 /**
  * @author chaostone
  */
-class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializer, val ttl: Int = -1)
+class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializer,
+  ktype: Class[K], vtype: Class[V], val ttl: Int = -1)
     extends Cache[K, V] {
 
   import RedisCache._
@@ -52,7 +53,7 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     val cache = pool.getResource
     try {
       val b = cache.get(buildKey(name, key).getBytes)
-      if (b == null) None else Some(serializer.asObject(classOf[AnyRef], b).asInstanceOf[V])
+      if (b == null) None else Some(serializer.asObject(vtype, b))
     } finally {
       cache.close()
     }

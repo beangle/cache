@@ -5,7 +5,9 @@ import org.beangle.commons.io.DefaultBinarySerializer
 object RedisCacheTest {
   def main(args: Array[String]): Unit = {
     val pool = JedisPoolFactory.connect(Map.empty)
-    val cache = new RedisCache[String, String]("test", pool, DefaultBinarySerializer)
+    DefaultBinarySerializer.registerClass(classOf[String])
+    val cache = new RedisCache[String, String]("test", pool, DefaultBinarySerializer,
+      classOf[String], classOf[String])
     (0 until 1000) foreach { i =>
       cache.put(i.toString, i.toString)
     }
