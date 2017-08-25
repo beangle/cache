@@ -34,12 +34,12 @@ class RedisCacheManager(pool: JedisPool, serializer: BinarySerializer, autoCreat
 
   protected override def newCache[K, V](name: String, keyType: Class[K], valueType: Class[V]): Cache[K, V] = {
     registerClass(keyType, valueType)
-    new RedisCache(name, pool, serializer, ttl)
+    new RedisCache(name, pool, serializer, keyType, valueType, ttl)
   }
 
   protected override def findCache[K, V](name: String, keyType: Class[K], valueType: Class[V]): Cache[K, V] = {
     registerClass(keyType, valueType)
-    new RedisCache(name, pool, serializer, ttl)
+    new RedisCache(name, pool, serializer, keyType, valueType, ttl)
   }
 
   override def destroy(): Unit = {
