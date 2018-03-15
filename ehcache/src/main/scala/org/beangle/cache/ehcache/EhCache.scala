@@ -18,8 +18,8 @@
  */
 package org.beangle.cache.ehcache
 
+import java.util.function.Supplier
 import org.beangle.cache.Cache
-import org.ehcache.ValueSupplier
 
 /**
  * @author chaostone
@@ -72,13 +72,15 @@ class EhCache[K, V](cache: org.ehcache.Cache[K, V]) extends Cache[K, V] {
   }
 
   override def ttl: Int = {
-    val duration = cache.getRuntimeConfiguration.getExpiry.getExpiryForCreation(null.asInstanceOf[K], null.asInstanceOf[V])
-    duration.getTimeUnit.toSeconds(duration.getLength).asInstanceOf[Int]
+    val duration = cache.getRuntimeConfiguration
+      .getExpiryPolicy.getExpiryForCreation(null.asInstanceOf[K], null.asInstanceOf[V])
+    duration.getSeconds.asInstanceOf[Int]
   }
 
   override def tti: Int = {
-    val duration = cache.getRuntimeConfiguration.getExpiry.getExpiryForAccess(null.asInstanceOf[K],
-      null.asInstanceOf[ValueSupplier[V]])
-    duration.getTimeUnit.toSeconds(duration.getLength).asInstanceOf[Int]
+    val duration = cache.getRuntimeConfiguration.getExpiryPolicy.getExpiryForAccess(
+      null.asInstanceOf[K],
+      null.asInstanceOf[Supplier[V]])
+    duration.getSeconds.asInstanceOf[Int]
   }
 }
