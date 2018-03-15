@@ -38,11 +38,11 @@
   </scm>
 
   <properties>
-    <commons.version>5.0.0</commons.version>
-    <ehcache.version>3.4.0</ehcache.version>
-    <caffeine.version>2.6.1</caffeine.version>
+    <commons.version>5.1.0.M2</commons.version>
+    <ehcache.version>3.5.0</ehcache.version>
+    <caffeine.version>2.6.2</caffeine.version>
     <jedis.version>2.9.0</jedis.version>
-    <jgroups.version>4.0.9.Final</jgroups.version>
+    <jgroups.version>4.0.10.Final</jgroups.version>
   </properties>
 
   <dependencyManagement>
