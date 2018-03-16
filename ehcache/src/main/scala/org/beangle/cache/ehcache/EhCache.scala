@@ -1,25 +1,25 @@
 /*
- * Beangle, Agile Development Scaffold and Toolkit
+ * Beangle, Agile Development Scaffold and Toolkits.
  *
- * Copyright (c) 2005-2017, Beangle Software.
+ * Copyright © 2005, The Beangle Software.
  *
- * Beangle is free software: you can redistribute it and/or modify
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Beangle is distributed in the hope that it will be useful.
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with Beangle.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.beangle.cache.ehcache
 
+import java.util.function.Supplier
 import org.beangle.cache.Cache
-import org.ehcache.ValueSupplier
 
 /**
  * @author chaostone
@@ -72,13 +72,15 @@ class EhCache[K, V](cache: org.ehcache.Cache[K, V]) extends Cache[K, V] {
   }
 
   override def ttl: Int = {
-    val duration = cache.getRuntimeConfiguration.getExpiry.getExpiryForCreation(null.asInstanceOf[K], null.asInstanceOf[V])
-    duration.getTimeUnit.toSeconds(duration.getLength).asInstanceOf[Int]
+    val duration = cache.getRuntimeConfiguration
+      .getExpiryPolicy.getExpiryForCreation(null.asInstanceOf[K], null.asInstanceOf[V])
+    duration.getSeconds.asInstanceOf[Int]
   }
 
   override def tti: Int = {
-    val duration = cache.getRuntimeConfiguration.getExpiry.getExpiryForAccess(null.asInstanceOf[K],
-      null.asInstanceOf[ValueSupplier[V]])
-    duration.getTimeUnit.toSeconds(duration.getLength).asInstanceOf[Int]
+    val duration = cache.getRuntimeConfiguration.getExpiryPolicy.getExpiryForAccess(
+      null.asInstanceOf[K],
+      null.asInstanceOf[Supplier[V]])
+    duration.getSeconds.asInstanceOf[Int]
   }
 }
