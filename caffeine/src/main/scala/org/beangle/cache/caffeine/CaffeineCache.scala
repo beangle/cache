@@ -90,13 +90,13 @@ class CaffeineCache[K, V](store: CCache[K, V]) extends Cache[K, V] {
 
   override def tti: Int = {
     val expiration = store.policy().expireAfterAccess()
-    if (expiration.isPresent()) expiration.get.getExpiresAfter(TimeUnit.SECONDS).asInstanceOf[Int]
+    if (expiration.isPresent) expiration.get.getExpiresAfter(TimeUnit.SECONDS).asInstanceOf[Int]
     else -1
   }
 
   override def ttl: Int = {
     val expiration = store.policy().expireAfterWrite()
-    if (expiration.isPresent()) expiration.get.getExpiresAfter(TimeUnit.SECONDS).asInstanceOf[Int]
+    if (expiration.isPresent) expiration.get.getExpiresAfter(TimeUnit.SECONDS).asInstanceOf[Int]
     else -1
   }
 }

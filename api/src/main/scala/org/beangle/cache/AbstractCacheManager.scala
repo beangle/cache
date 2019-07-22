@@ -18,8 +18,6 @@
  */
 package org.beangle.cache
 
-import org.beangle.commons.collection.Collections
-
 /**
  * @author chaostone
  */
@@ -38,11 +36,11 @@ abstract class AbstractCacheManager(val autoCreate: Boolean) extends CacheManage
             case Some(cache) => cache.asInstanceOf[Cache[K, V]]
             case None =>
               if (autoCreate) {
-                val newcache = newCache(name, keyType, valueType).asInstanceOf[Cache[K, V]]
+                val newcache = newCache(name, keyType, valueType)
                 registry += (name -> newcache)
                 newcache.asInstanceOf[Cache[K, V]]
               } else {
-                val existed = findCache(name, keyType, valueType).asInstanceOf[Cache[K, V]]
+                val existed = findCache(name, keyType, valueType)
                 if (null == existed) throw new RuntimeException(s"Cannot find cache $name")
                 registry += (name -> existed)
                 existed

@@ -19,16 +19,16 @@
 package org.beangle.cache.ehcache
 
 import java.util.function.Supplier
+
 import org.beangle.cache.Cache
 
 /**
- * @author chaostone
- */
+  * @author chaostone
+  */
 class EhCache[K, V](cache: org.ehcache.Cache[K, V]) extends Cache[K, V] {
 
   override def get(key: K): Option[V] = {
-    val ele = cache.get(key)
-    if (null == ele) None else Some(ele)
+    Option(cache.get(key))
   }
 
   override def touch(key: K): Boolean = {

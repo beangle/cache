@@ -18,9 +18,8 @@
  */
 package org.beangle.cache.ehcache
 
-import org.ehcache.event.{ CacheEvent, CacheEventListener, EventType }
-import org.beangle.cache.Cache
-import org.beangle.cache.Broadcaster
+import org.beangle.cache.{Broadcaster, Cache}
+import org.ehcache.event.{CacheEvent, CacheEventListener}
 
 /**
  * @author chaostone

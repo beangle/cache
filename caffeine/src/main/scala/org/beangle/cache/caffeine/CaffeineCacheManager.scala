@@ -18,18 +18,16 @@
  */
 package org.beangle.cache.caffeine
 
-import org.beangle.cache.AbstractCacheManager
-import org.beangle.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
-import com.github.benmanes.caffeine.cache.{ Cache => CCache }
 import java.util.concurrent.TimeUnit
-import org.beangle.commons.collection.Properties
+
+import com.github.benmanes.caffeine.cache.{Caffeine, Cache => CCache}
+import org.beangle.cache.{AbstractCacheManager, Cache}
 import org.beangle.commons.io.IOs
 import org.beangle.commons.lang.ClassLoaders
 
 class CaffeineCacheManager(autoCreate: Boolean = false) extends AbstractCacheManager(autoCreate) {
 
-  val specs = ClassLoaders.getResource("META-INF/caffeine.properties") match {
+  private val specs = ClassLoaders.getResource("META-INF/caffeine.properties") match {
     case Some(p) => IOs.readProperties(p)
     case None    => Map.empty[String, String]
   }

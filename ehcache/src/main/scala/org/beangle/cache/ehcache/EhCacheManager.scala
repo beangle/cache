@@ -19,18 +19,16 @@
 package org.beangle.cache.ehcache
 
 import java.net.URL
-import scala.annotation.elidable
-import scala.annotation.elidable.ASSERTION
-import org.beangle.cache.AbstractCacheManager
+
+import org.beangle.cache.{AbstractCacheManager, Cache}
 import org.beangle.commons.bean.Initializing
-import org.beangle.cache.Cache
 import org.beangle.commons.lang.ClassLoaders
 import org.beangle.commons.logging.Logging
 import org.ehcache.config.CacheConfiguration
-import org.ehcache.config.builders.{ CacheConfigurationBuilder, CacheManagerBuilder, ConfigurationBuilder }
-import org.ehcache.xml.XmlConfiguration
+import org.ehcache.config.builders.{CacheConfigurationBuilder, CacheManagerBuilder}
 import org.ehcache.core.config.DefaultConfiguration
 import org.ehcache.spi.service.ServiceCreationConfiguration
+import org.ehcache.xml.XmlConfiguration
 
 /**
  * @author chaostone
@@ -49,7 +47,7 @@ class EhCacheManager(val name: String = "ehcache", autoCreate: Boolean = false) 
     if (null == configUrl) {
       ClassLoaders.getResource(name + ".xml") match {
         case Some(u) => configUrl = u
-        case None    => logger.warn(s"Cannot find ${name}.xml in classpath.")
+        case None    => logger.warn(s"Cannot find $name.xml in classpath.")
       }
     }
     innerManager =

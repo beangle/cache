@@ -3,10 +3,10 @@
   <parent>
     <groupId>org.beangle</groupId>
     <artifactId>beangle-scala</artifactId>
-    <version>25.2</version>
+    <version>26.0-SNAPSHOT</version>
   </parent>
   <groupId>org.beangle.cache</groupId>
-  <artifactId>beangle-cache-parent_2.12</artifactId>
+  <artifactId>beangle-cache-parent_2.13</artifactId>
   <packaging>pom</packaging>
   <version>0.0.16-SNAPSHOT</version>
   <name>Beangle Cache Parent</name>
@@ -38,7 +38,7 @@
   </scm>
 
   <properties>
-    <commons.version>5.1.5</commons.version>
+    <commons.version>5.1.8-SNAPSHOT</commons.version>
     <ehcache.version>3.7.0</ehcache.version>
     <caffeine.version>2.7.0</caffeine.version>
     <jedis.version>2.9.3</jedis.version>
@@ -49,12 +49,12 @@
     <dependencies>
       <dependency>
         <groupId>org.beangle.commons</groupId>
-        <artifactId>beangle-commons-core_2.12</artifactId>
+        <artifactId>beangle-commons-core_2.13</artifactId>
         <version>${commons.version}</version>
       </dependency>
       <dependency>
         <groupId>org.beangle.cache</groupId>
-        <artifactId>beangle-cache-api_2.12</artifactId>
+        <artifactId>beangle-cache-api_2.13</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>
@@ -63,7 +63,7 @@
   <dependencies>
     <dependency>
       <groupId>org.beangle.commons</groupId>
-      <artifactId>beangle-commons-core_2.12</artifactId>
+      <artifactId>beangle-commons-core_2.13</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

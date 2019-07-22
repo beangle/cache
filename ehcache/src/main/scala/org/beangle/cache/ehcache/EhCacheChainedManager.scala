@@ -18,21 +18,19 @@
  */
 package org.beangle.cache.ehcache
 
-import java.util.Arrays
+import java.{util => ju}
 
-import org.beangle.cache.{ AbstractCacheManager, Broadcaster, BroadcasterBuilder }
-import org.beangle.cache.chain.{ ChainedCache, ChainedManager }
-import org.beangle.cache.ehcache.Listener.{ ChainExpiry, EvictionBroadcaster }
+import org.beangle.cache.chain.{ChainedCache, ChainedManager}
+import org.beangle.cache._
 import org.beangle.commons.bean.Initializing
-import org.beangle.cache.{ Cache, CacheManager }
 import org.ehcache.config.builders.CacheEventListenerConfigurationBuilder
 import org.ehcache.event.EventType
 
 /**
- * @author chaostone
- */
+  * @author chaostone
+  */
 class EhCacheChainedManager(ehManager: EhCacheManager, targetManager: CacheManager, autoCreate: Boolean)
-    extends AbstractCacheManager(autoCreate) with Initializing with ChainedManager {
+  extends AbstractCacheManager(autoCreate) with Initializing with ChainedManager {
 
   var propagateExpiration: Boolean = false
   var broadcasterBuilder: BroadcasterBuilder = _
@@ -62,7 +60,7 @@ class EhCacheChainedManager(ehManager: EhCacheManager, targetManager: CacheManag
 
       if (null != broadcaster) {
         val eventTypes = new java.util.HashSet[EventType]
-        eventTypes.addAll(Arrays.asList(EventType.values: _*))
+        eventTypes.addAll(ju.Arrays.asList(EventType.values: _*))
         if (!propagateExpiration) eventTypes.remove(EventType.EXPIRED)
 
         val broadcasterConfig = CacheEventListenerConfigurationBuilder

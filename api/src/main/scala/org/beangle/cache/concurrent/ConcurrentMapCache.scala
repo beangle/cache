@@ -18,27 +18,25 @@
  */
 package org.beangle.cache.concurrent
 
-import java.util.concurrent.ConcurrentMap
 import org.beangle.cache.Cache
 
 /**
- * Cache based Concurrent Map.
- *
- * @author chaostone
- * @since 3.2.0
- */
+  * Cache based Concurrent Map.
+  * @author chaostone
+  * @since 3.2.0
+  */
 class ConcurrentMapCache[K, V] extends Cache[K, V] {
 
   private val store = new collection.concurrent.TrieMap[K, V]
 
   override def get(key: K): Option[V] = store.get(key)
 
-  override def put(key: K, value: V) {
+  override def put(key: K, value: V): Unit = {
     store.put(key, value)
   }
 
   override def evict(key: K): Boolean = {
-    !store.remove(key).isEmpty
+    store.remove(key).nonEmpty
   }
 
   override def exists(key: K): Boolean = {
