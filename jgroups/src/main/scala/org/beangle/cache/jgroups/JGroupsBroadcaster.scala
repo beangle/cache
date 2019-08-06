@@ -28,7 +28,7 @@ import org.jgroups.{JChannel, Message, ReceiverAdapter}
 
 class JGroupsBroadcasterBuilder(networkConfigUrl: URL, serializer: BinarySerializer) extends BroadcasterBuilder {
   def build(channel: String, localManager: CacheManager): Broadcaster = {
-    val broadcaster = new JGroupsBroadcaster(channel, new JChannel(networkConfigUrl), serializer, localManager)
+    val broadcaster = new JGroupsBroadcaster(channel, new JChannel(networkConfigUrl.openStream()), serializer, localManager)
     broadcaster.init()
     broadcaster
   }

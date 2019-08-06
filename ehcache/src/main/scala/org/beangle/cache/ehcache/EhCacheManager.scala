@@ -34,7 +34,7 @@ import org.ehcache.xml.XmlConfiguration
  * @author chaostone
  */
 class EhCacheManager(val name: String = "ehcache", autoCreate: Boolean = false) extends AbstractCacheManager(autoCreate)
-    with Initializing with Logging {
+  with Initializing with Logging {
 
   var configUrl: URL = _
 
@@ -47,7 +47,7 @@ class EhCacheManager(val name: String = "ehcache", autoCreate: Boolean = false) 
     if (null == configUrl) {
       ClassLoaders.getResource(name + ".xml") match {
         case Some(u) => configUrl = u
-        case None    => logger.warn(s"Cannot find $name.xml in classpath.")
+        case None => logger.warn(s"Cannot find $name.xml in classpath.")
       }
     }
     innerManager =
@@ -55,7 +55,7 @@ class EhCacheManager(val name: String = "ehcache", autoCreate: Boolean = false) 
         xmlConfig = new XmlConfiguration(configUrl)
         CacheManagerBuilder.newCacheManager(xmlConfig)
       } else {
-        val config = new DefaultConfiguration(null.asInstanceOf[ClassLoader], Array.empty[ServiceCreationConfiguration[_]]: _*)
+        val config = new DefaultConfiguration(null.asInstanceOf[ClassLoader], Array.empty[ServiceCreationConfiguration[_, _]]: _*)
         CacheManagerBuilder.newCacheManager(config)
       }
     innerManager.init()

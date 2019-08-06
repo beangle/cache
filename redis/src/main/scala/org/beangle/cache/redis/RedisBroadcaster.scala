@@ -25,7 +25,7 @@ import org.beangle.commons.io.BinarySerializer
 import org.beangle.commons.logging.Logging
 import redis.clients.jedis.exceptions.JedisConnectionException
 import redis.clients.jedis.{BinaryJedisPubSub, JedisPool}
-import redis.clients.util.SafeEncoder
+import redis.clients.jedis.util.SafeEncoder
 
 class RedisBroadcasterBuilder(pool: JedisPool, serializer: BinarySerializer) extends BroadcasterBuilder {
   def build(channel: String, localManager: CacheManager): Broadcaster = {
