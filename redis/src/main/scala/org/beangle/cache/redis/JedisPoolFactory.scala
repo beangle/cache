@@ -18,9 +18,8 @@
  */
 package org.beangle.cache.redis
 
-import org.beangle.commons.bean.{ Factory, Initializing }
-
-import redis.clients.jedis.{ JedisPool, JedisPoolConfig }
+import org.beangle.commons.bean.Factory
+import redis.clients.jedis.{JedisPool, JedisPoolConfig}
 
 object JedisPoolFactory {
 
@@ -71,7 +70,7 @@ object JedisPoolFactory {
  */
 class JedisPoolFactory(props: Map[String, String]) extends Factory[JedisPool] {
 
-  val pool = JedisPoolFactory.connect(props)
+  private val pool = JedisPoolFactory.connect(props)
 
   def result: JedisPool = {
     pool

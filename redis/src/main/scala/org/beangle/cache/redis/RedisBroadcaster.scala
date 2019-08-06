@@ -18,15 +18,14 @@
  */
 package org.beangle.cache.redis
 
-import org.beangle.cache.{ Broadcaster, BroadcasterBuilder, EvictMessage }
+import org.beangle.cache.chain.ChainedManager
+import org.beangle.cache.{Broadcaster, BroadcasterBuilder, CacheManager, EvictMessage}
 import org.beangle.commons.bean.Initializing
-import org.beangle.cache.CacheManager
 import org.beangle.commons.io.BinarySerializer
 import org.beangle.commons.logging.Logging
-import redis.clients.jedis.{ BinaryJedisPubSub, JedisPool }
 import redis.clients.jedis.exceptions.JedisConnectionException
-import redis.clients.util.SafeEncoder
-import org.beangle.cache.chain.ChainedManager
+import redis.clients.jedis.{BinaryJedisPubSub, JedisPool}
+import redis.clients.jedis.util.SafeEncoder
 
 class RedisBroadcasterBuilder(pool: JedisPool, serializer: BinarySerializer) extends BroadcasterBuilder {
   def build(channel: String, localManager: CacheManager): Broadcaster = {
@@ -42,11 +41,12 @@ class RedisBroadcasterBuilder(pool: JedisPool, serializer: BinarySerializer) ext
 object SubscriberDaemon {
   var running = false
 }
+
 /**
- * Subscribe and on receive message thread
- */
+  * Subscribe and on receive message thread
+  */
 class SubscriberDaemon(pool: JedisPool, broardcaster: RedisBroadcaster, channel: Array[Byte]) extends Runnable with Logging {
-  override def run() {
+  override def run(): Unit = {
     SubscriberDaemon.synchronized {
       if (SubscriberDaemon.running) {
         logger.warn("SubscriberDaemon is running,opereration aborted.")
@@ -74,11 +74,12 @@ class SubscriberDaemon(pool: JedisPool, broardcaster: RedisBroadcaster, channel:
     }
   }
 }
+
 /**
- * @author chaostone
- */
+  * @author chaostone
+  */
 class RedisBroadcaster(channel: Array[Byte], pool: JedisPool, serializer: BinarySerializer, localManager: CacheManager)
-    extends BinaryJedisPubSub with Broadcaster with Initializing {
+  extends BinaryJedisPubSub with Broadcaster with Initializing {
 
   var subscriber: Thread = _
 
@@ -90,7 +91,7 @@ class RedisBroadcaster(channel: Array[Byte], pool: JedisPool, serializer: Binary
     subscriber.start()
   }
 
-  override def onMessage(channel: Array[Byte], message: Array[Byte]) {
+  override def onMessage(channel: Array[Byte], message: Array[Byte]): Unit = {
     val msg = serializer.asObject(classOf[EvictMessage], message)
     if (!msg.isIssueByLocal) {
       val cache = localManager.getCache(msg.cache, classOf[Any], classOf[Any])

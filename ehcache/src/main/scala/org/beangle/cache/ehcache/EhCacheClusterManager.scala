@@ -18,13 +18,10 @@
  */
 package org.beangle.cache.ehcache
 
-import java.net.URL
-import org.beangle.cache.{ AbstractCacheManager, Broadcaster, BroadcasterBuilder }
+import org.beangle.cache.{AbstractCacheManager, Broadcaster, BroadcasterBuilder, Cache}
 import org.beangle.commons.bean.Initializing
-import org.beangle.cache.Cache
-import org.beangle.commons.lang.ClassLoaders
-import org.ehcache.event.EventType
 import org.ehcache.config.builders.CacheEventListenerConfigurationBuilder
+import org.ehcache.event.EventType
 
 /**
  * @author chaostone

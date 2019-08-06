@@ -16,41 +16,39 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.beangle.cache.redis
+package org.beangle.cache.jgroups
 
+import java.net.URL
+
+import org.beangle.cache.{Broadcaster, BroadcasterBuilder, CacheManager, EvictMessage}
 import org.beangle.commons.bean.Initializing
-import org.beangle.cache.CacheManager
 import org.beangle.commons.io.BinarySerializer
 import org.beangle.commons.logging.Logging
-import org.jgroups.{ JChannel, Message, ReceiverAdapter }
-import java.net.URL
-import org.beangle.cache.Broadcaster
-import org.beangle.cache.BroadcasterBuilder
-import org.beangle.cache.EvictMessage
+import org.jgroups.{JChannel, Message, ReceiverAdapter}
 
 class JGroupsBroadcasterBuilder(networkConfigUrl: URL, serializer: BinarySerializer) extends BroadcasterBuilder {
   def build(channel: String, localManager: CacheManager): Broadcaster = {
-    val broadcaster = new JGroupsBroadcaster(channel, new JChannel(networkConfigUrl), serializer, localManager)
+    val broadcaster = new JGroupsBroadcaster(channel, new JChannel(networkConfigUrl.openStream()), serializer, localManager)
     broadcaster.init()
     broadcaster
   }
 }
 
 /**
- * @author chaostone
- */
+  * @author chaostone
+  */
 class JGroupsBroadcaster(channelName: String, channel: JChannel, serializer: BinarySerializer, localManager: CacheManager)
-    extends ReceiverAdapter with Broadcaster with Initializing with Logging {
+  extends ReceiverAdapter with Broadcaster with Initializing with Logging {
 
   def init(): Unit = {
     channel.setReceiver(this)
     channel.connect(this.channelName)
   }
 
-  override def receive(msg: Message) {
+  override def receive(msg: Message): Unit = {
     if (msg.getSrc.equals(channel.getAddress)) return
     val buffer = msg.getBuffer
-    if (buffer.length > 0) {
+    if (buffer.nonEmpty) {
       val msg = serializer.asObject(classOf[EvictMessage], buffer)
       if (!msg.isIssueByLocal) {
         if (null == msg.key) {

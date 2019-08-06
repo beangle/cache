@@ -18,13 +18,10 @@
  */
 package org.beangle.cache.redis
 
-import scala.collection.JavaConverters.asScalaBuffer
-
 import org.beangle.cache.Cache
 import org.beangle.commons.io.BinarySerializer
-
-import RedisCache.buildKey
 import redis.clients.jedis.JedisPool
+import redis.clients.jedis.params.SetParams
 
 object RedisCache {
 
@@ -45,9 +42,6 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     extends Cache[K, V] {
 
   import RedisCache._
-
-  private val NX = "NX".getBytes
-  private val EX = "EX".getBytes
 
   override def get(key: K): Option[V] = {
     val cache = pool.getResource
@@ -78,9 +72,9 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     try {
       val redisKey = buildKey(name, key).getBytes
       if (ttl > 0) {
-        cache.set(redisKey, serializer.asBytes(value), NX, EX, ttl) == "OK"
+        cache.set(redisKey, serializer.asBytes(value), SetParams.setParams().nx().ex(ttl)) == "OK"
       } else {
-        cache.set(redisKey, serializer.asBytes(value), NX) == "OK"
+        cache.set(redisKey, serializer.asBytes(value), SetParams.setParams().nx()) == "OK"
       }
       false
     } finally {
@@ -102,7 +96,6 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     try {
       val redisKey = buildKey(name, key).getBytes
       val o = cache.get(redisKey)
-      val newValue = serializer.asBytes(value)
       if (ttl > 0) {
         cache.setex(redisKey, ttl, serializer.asBytes(value))
       } else {
@@ -120,7 +113,6 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
       val redisKey = buildKey(name, key).getBytes
       val o = cache.get(redisKey)
       if (o != null && o == serializer.asBytes(oldvalue)) {
-        val newValue = serializer.asBytes(newvalue)
         if (ttl > 0) {
           cache.setex(redisKey, ttl, serializer.asBytes(newvalue))
         } else {

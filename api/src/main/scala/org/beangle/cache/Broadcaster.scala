@@ -18,13 +18,12 @@
  */
 package org.beangle.cache
 
-import EvictMessage.{ Eviction, LocalIssuer }
-
 /**
- * @author chaostone
- */
+  * @author chaostone
+  */
 trait Broadcaster {
   def publishEviction(cache: String, key: Any): Unit
+
   def publishClear(cache: String): Unit
 }
 
@@ -33,19 +32,22 @@ trait BroadcasterBuilder {
 }
 
 object EvictMessage {
-  val Eviction = 0.asInstanceOf[Byte]
-  val Clear = 1.asInstanceOf[Byte]
-  val LocalIssuer = new scala.util.Random(System.currentTimeMillis).nextInt(1000000)
+  val Eviction: Byte = 0.asInstanceOf[Byte]
+  val Clear: Byte = 1.asInstanceOf[Byte]
+  val LocalIssuer: Int = new scala.util.Random(System.currentTimeMillis).nextInt(1000000)
 }
 
 class EvictMessage(val cache: String, val key: Any) extends Serializable {
+
   import EvictMessage._
-  var operation = Eviction
+
+  var operation: Byte = Eviction
   var issuer: Int = LocalIssuer
 
   def isIssueByLocal: Boolean = {
     issuer == LocalIssuer
   }
+
   override def toString: String = {
     if (operation == Eviction) "clear" + cache else s"evict $key  in $cache"
   }
