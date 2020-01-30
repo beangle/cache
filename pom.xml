@@ -3,12 +3,12 @@
   <parent>
     <groupId>org.beangle</groupId>
     <artifactId>beangle-scala</artifactId>
-    <version>26.4</version>
+    <version>27.0</version>
   </parent>
   <groupId>org.beangle.cache</groupId>
   <artifactId>beangle-cache-parent_2.13</artifactId>
   <packaging>pom</packaging>
-  <version>0.0.17</version>
+  <version>0.0.18</version>
   <name>Beangle Cache Parent</name>
 
   <modules>
@@ -38,11 +38,11 @@
   </scm>
 
   <properties>
-    <commons.version>5.1.10</commons.version>
+    <commons.version>5.1.11</commons.version>
     <ehcache.version>3.8.1</ehcache.version>
-    <caffeine.version>2.8.0</caffeine.version>
-    <jedis.version>3.1.0</jedis.version>
-    <jgroups.version>4.1.7.Final</jgroups.version>
+    <caffeine.version>2.8.1</caffeine.version>
+    <jedis.version>3.2.0</jedis.version>
+    <jgroups.version>4.1.9.Final</jgroups.version>
   </properties>
 
   <dependencyManagement>
