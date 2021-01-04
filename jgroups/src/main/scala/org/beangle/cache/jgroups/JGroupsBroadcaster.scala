@@ -24,7 +24,7 @@ import org.beangle.cache.{Broadcaster, BroadcasterBuilder, CacheManager, EvictMe
 import org.beangle.commons.bean.Initializing
 import org.beangle.commons.io.BinarySerializer
 import org.beangle.commons.logging.Logging
-import org.jgroups.{JChannel, Message, ReceiverAdapter}
+import org.jgroups.{BytesMessage, JChannel, Message, Receiver}
 
 class JGroupsBroadcasterBuilder(networkConfigUrl: URL, serializer: BinarySerializer) extends BroadcasterBuilder {
   def build(channel: String, localManager: CacheManager): Broadcaster = {
@@ -35,19 +35,20 @@ class JGroupsBroadcasterBuilder(networkConfigUrl: URL, serializer: BinarySeriali
 }
 
 /**
-  * @author chaostone
-  */
+ * @author chaostone
+ */
 class JGroupsBroadcaster(channelName: String, channel: JChannel, serializer: BinarySerializer, localManager: CacheManager)
-  extends ReceiverAdapter with Broadcaster with Initializing with Logging {
+  extends Receiver with Broadcaster with Initializing with Logging {
 
   def init(): Unit = {
     channel.setReceiver(this)
     channel.connect(this.channelName)
   }
 
+
   override def receive(msg: Message): Unit = {
     if (msg.getSrc.equals(channel.getAddress)) return
-    val buffer = msg.getBuffer
+    val buffer = msg.getArray
     if (buffer.nonEmpty) {
       val msg = serializer.asObject(classOf[EvictMessage], buffer)
       if (!msg.isIssueByLocal) {
@@ -62,7 +63,7 @@ class JGroupsBroadcaster(channelName: String, channel: JChannel, serializer: Bin
 
   override def publishEviction(cache: String, key: Any): Unit = {
     try {
-      channel.send(new Message(null, serializer.asBytes(new EvictMessage(cache, key))))
+      channel.send(new BytesMessage(null, serializer.asBytes(new EvictMessage(cache, key))))
     } catch {
       case e: Throwable =>
         logger.error("Unable to evict,cache=" + cache + " key=" + key, e);
@@ -71,7 +72,7 @@ class JGroupsBroadcaster(channelName: String, channel: JChannel, serializer: Bin
 
   override def publishClear(cache: String): Unit = {
     try {
-      channel.send(new Message(null, serializer.asBytes(new EvictMessage(cache, null))))
+      channel.send(new BytesMessage(null, serializer.asBytes(new EvictMessage(cache, null))))
     } catch {
       case e: Throwable =>
         logger.error("Unable to clear cache :" + cache, e);
