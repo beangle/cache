@@ -59,11 +59,11 @@ class ConcurrentMapCache[K, V] extends Cache[K, V] {
     store.clear()
   }
 
-  override def ttl: Int = {
+  override def ttl: Long = {
     -1
   }
 
-  override def tti: Int = {
+  override def tti: Long = {
     -1
   }
 

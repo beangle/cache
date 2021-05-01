@@ -85,10 +85,10 @@ trait Cache[K, V] {
   /**
    * Time to live seconds,-1 is forever
    */
-  def ttl: Int
+  def ttl: Long
 
   /**
    * Time to idle seconds,-1 is forever
    */
-  def tti: Int
+  def tti: Long
 }

@@ -79,11 +79,11 @@ class ChainedCache[K, V](first: Cache[K, V], second: Cache[K, V]) extends Cache[
     second.clear()
   }
 
-  override def ttl: Int = {
+  override def ttl: Long = {
     first.ttl
   }
 
-  override def tti: Int = {
+  override def tti: Long = {
     first.tti
   }
 }

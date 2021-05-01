@@ -38,7 +38,7 @@ object RedisCache {
  * @author chaostone
  */
 class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializer,
-  ktype: Class[K], vtype: Class[V], val ttl: Int = -1)
+  ktype: Class[K], vtype: Class[V], val ttl: Long = -1)
     extends Cache[K, V] {
 
   import RedisCache._
@@ -155,7 +155,7 @@ class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializ
     }
   }
 
-  override def tti: Int = {
+  override def tti: Long = {
     ttl
   }
 }
