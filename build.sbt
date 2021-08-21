@@ -3,7 +3,7 @@ import BuildSettings._
 import sbt.url
 
 ThisBuild / organization := "org.beangle.cache"
-ThisBuild / version := "0.4.4"
+ThisBuild / version := "0.0.23"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
