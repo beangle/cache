@@ -17,12 +17,9 @@
 
 package org.beangle.cache.caffeine
 
-import org.junit.runner.RunWith
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.funspec.AnyFunSpec
-import org.scalatestplus.junit.JUnitRunner
 
-@RunWith(classOf[JUnitRunner])
 class CaffeineCacheTest extends AnyFunSpec with Matchers {
 
   describe("CaffeineCache") {

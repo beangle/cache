@@ -29,8 +29,8 @@ object RedisCacheTest {
       cache.put(i.toString, i.toString)
     }
     println(cache.get("3"))
-    println("idle:", pool.getNumIdle)
-    println("active:", pool.getNumActive)
-    println("await:", pool.getNumWaiters)
+    println("idle:"+ pool.getNumIdle)
+    println("active:" + pool.getNumActive)
+    println("await:" + pool.getNumWaiters)
   }
 }
