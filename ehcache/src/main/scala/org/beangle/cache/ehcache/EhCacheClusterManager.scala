@@ -48,7 +48,7 @@ class EhCacheClusterManager(ehManager: EhCacheManager, broadcasterBuilder: Broad
       val broadcasterConfig = CacheEventListenerConfigurationBuilder
         .newEventListenerConfiguration(classOf[Listener.EvictionBroadcaster], eventTypes)
         .unordered().asynchronous().constructedWith(broadcaster, name)
-      builder = builder.add(broadcasterConfig)
+      builder = builder.withService(broadcasterConfig)
       ehManager.newCache(name, builder.build())
     } else {
       new EhCache(c)

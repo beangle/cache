@@ -65,14 +65,14 @@ class EhCacheChainedManager(ehManager: EhCacheManager, targetManager: CacheManag
         val broadcasterConfig = CacheEventListenerConfigurationBuilder
           .newEventListenerConfiguration(classOf[Listener.EvictionBroadcaster], eventTypes)
           .unordered().asynchronous().constructedWith(broadcaster, name)
-        builder = builder.add(broadcasterConfig)
+        builder = builder.withService(broadcasterConfig)
       }
       //如果需要传播过期事件，需要再次构造builder
       if (propagateExpiration) {
         val expireListenerConfig = CacheEventListenerConfigurationBuilder
           .newEventListenerConfiguration(classOf[Listener.ChainExpiry], EventType.EXPIRED)
           .unordered().asynchronous().constructedWith(targetCache)
-        builder = builder.add(expireListenerConfig)
+        builder = builder.withService(expireListenerConfig)
       }
       val newer = ehManager.newCache(name, builder.build())
       new ChainedCache(newer, targetCache)
