@@ -20,6 +20,8 @@ package org.beangle.cache.redis
 import org.beangle.commons.bean.Factory
 import redis.clients.jedis.{JedisPool, JedisPoolConfig}
 
+import java.time.Duration
+
 object JedisPoolFactory {
 
   def connect(props: Map[String, String]): JedisPool = {
@@ -39,9 +41,8 @@ object JedisPoolFactory {
     config.setTestOnBorrow(getProperty(props, "testOnBorrow", true))
     config.setTestOnReturn(getProperty(props, "testOnReturn", false))
     config.setNumTestsPerEvictionRun(getProperty(props, "numTestsPerEvictionRun", 10))
-    config.setMinEvictableIdleTimeMillis(getProperty(props, "minEvictableIdleTimeMillis", 1000))
-    config.setSoftMinEvictableIdleTimeMillis(getProperty(props, "softMinEvictableIdleTimeMillis", 10))
-    config.setTimeBetweenEvictionRunsMillis(getProperty(props, "timeBetweenEvictionRunsMillis", 10))
+    config.setSoftMinEvictableIdleTime(Duration.ofMillis(getProperty(props, "softMinEvictableIdleTimeMillis", 10)))
+    config.setTimeBetweenEvictionRuns(Duration.ofMillis(getProperty(props, "timeBetweenEvictionRunsMillis", 10)))
     config.setLifo(getProperty(props, "lifo", false))
 
     new JedisPool(config, host, port, timeout, password, database)
