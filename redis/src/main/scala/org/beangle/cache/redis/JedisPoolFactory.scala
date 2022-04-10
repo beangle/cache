@@ -36,7 +36,7 @@ object JedisPoolFactory {
     config.setMaxIdle(getProperty(props, "maxIdle", 10))
     config.setMinIdle(getProperty(props, "minIdle", 5))
     config.setMaxTotal(getProperty(props, "maxTotal", 100))
-    config.setMaxWaitMillis(getProperty(props, "maxWait", 50))
+    config.setMaxWait(Duration.ofMillis(getProperty(props, "maxWait", 50)))
     config.setTestWhileIdle(getProperty(props, "testWhileIdle", false))
     config.setTestOnBorrow(getProperty(props, "testOnBorrow", true))
     config.setTestOnReturn(getProperty(props, "testOnReturn", false))
