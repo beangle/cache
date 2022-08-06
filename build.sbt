@@ -2,7 +2,7 @@ import org.beangle.parent.Dependencies._
 import org.beangle.parent.Settings._
 
 ThisBuild / organization := "org.beangle.cache"
-ThisBuild / version := "0.0.27-SNAPSHOT"
+ThisBuild / version := "0.0.27"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -24,7 +24,7 @@ ThisBuild / description := "The Beangle Data Library"
 ThisBuild / homepage := Some(url("https://beangle.github.io/cache/index.html"))
 ThisBuild / resolvers += Resolver.mavenLocal
 
-val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % "5.2.13"
+val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % "5.3.0"
 
 val commonDeps = Seq(beangle_commons_core,  logback_classic, logback_core, scalatest)
 

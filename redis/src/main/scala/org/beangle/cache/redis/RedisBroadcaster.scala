@@ -44,7 +44,7 @@ object SubscriberDaemon {
 /**
   * Subscribe and on receive message thread
   */
-class SubscriberDaemon(pool: JedisPool, broardcaster: RedisBroadcaster, channel: Array[Byte]) extends Runnable with Logging {
+class SubscriberDaemon(pool: JedisPool, broadcaster: RedisBroadcaster, channel: Array[Byte]) extends Runnable with Logging {
   override def run(): Unit = {
     SubscriberDaemon.synchronized {
       if (SubscriberDaemon.running) {
@@ -59,7 +59,7 @@ class SubscriberDaemon(pool: JedisPool, broardcaster: RedisBroadcaster, channel:
       try {
         val jedis = pool.getResource
         logger.info("Subscribing redis on channel:" + SafeEncoder.encode(channel))
-        jedis.subscribe(broardcaster, channel)
+        jedis.subscribe(broadcaster, channel)
         jedis.close()
       } catch {
         case e: JedisConnectionException =>
@@ -83,7 +83,7 @@ class RedisBroadcaster(channel: Array[Byte], pool: JedisPool, serializer: Binary
   var subscriber: Thread = _
 
   def init(): Unit = {
-    //the subscribsion will block current thread,so we start a new one.
+    //the subscription will block current thread,so we start a new one.
     subscriber = new Thread(new SubscriberDaemon(pool, this, channel))
     subscriber.setName("RedisSubscriberDaemon")
     subscriber.setDaemon(true)
