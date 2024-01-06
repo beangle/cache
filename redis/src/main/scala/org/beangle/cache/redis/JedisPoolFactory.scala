@@ -41,12 +41,13 @@ object JedisPoolFactory {
     config.setTestOnBorrow(getProperty(props, "testOnBorrow", true))
     config.setTestOnReturn(getProperty(props, "testOnReturn", false))
     config.setNumTestsPerEvictionRun(getProperty(props, "numTestsPerEvictionRun", 10))
-    config.setSoftMinEvictableIdleTime(Duration.ofMillis(getProperty(props, "softMinEvictableIdleTimeMillis", 10)))
+    config.setSoftMinEvictableIdleDuration(Duration.ofMillis(getProperty(props, "softMinEvictableIdleTimeMillis", 10)))
     config.setTimeBetweenEvictionRuns(Duration.ofMillis(getProperty(props, "timeBetweenEvictionRunsMillis", 10)))
     config.setLifo(getProperty(props, "lifo", false))
 
     new JedisPool(config, host, port, timeout, password, database)
   }
+
   private def getProperty(props: Map[String, String], key: String, defaultValue: String): String = {
     props.getOrElse(key, defaultValue).trim()
   }
@@ -54,17 +55,18 @@ object JedisPoolFactory {
   private def getProperty(props: Map[String, String], key: String, defaultValue: Int): Int = {
     props.get(key) match {
       case Some(v) => Integer.parseInt(v.trim())
-      case None    => defaultValue
+      case None => defaultValue
     }
   }
 
   private def getProperty(props: Map[String, String], key: String, defaultValue: Boolean): Boolean = {
     props.get(key) match {
       case Some(v) => "true".equalsIgnoreCase(v.trim())
-      case None    => defaultValue
+      case None => defaultValue
     }
   }
 }
+
 /**
  * @author chaostone
  */
