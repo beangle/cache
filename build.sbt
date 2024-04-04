@@ -1,8 +1,9 @@
-import org.beangle.parent.Dependencies._
-import org.beangle.parent.Settings._
+import org.beangle.parent.Dependencies.*
+import org.beangle.parent.Settings.*
+import sbt.Keys.*
 
 ThisBuild / organization := "org.beangle.cache"
-ThisBuild / version := "0.1.8-SNAPSHOT"
+ThisBuild / version := "0.1.8"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -13,58 +14,28 @@ ThisBuild / scmInfo := Some(
 
 ThisBuild / developers := List(
   Developer(
-    id    = "chaostone",
-    name  = "Tihua Duan",
+    id = "chaostone",
+    name = "Tihua Duan",
     email = "duantihua@gmail.com",
-    url   = url("http://github.com/duantihua")
+    url = url("http://github.com/duantihua")
   )
 )
 
-ThisBuild / description := "The Beangle Data Library"
+ThisBuild / description := "The Beangle Cache Library"
 ThisBuild / homepage := Some(url("https://beangle.github.io/cache/index.html"))
 ThisBuild / resolvers += Resolver.mavenLocal
 
-val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % "5.6.10"
-
-val commonDeps = Seq(beangle_commons_core,  logback_classic, logback_core, scalatest)
+val beangle_commons = "org.beangle.commons" % "beangle-commons" % "5.6.15"
 
 lazy val root = (project in file("."))
-  .settings()
-  .aggregate(api,p_caffeine,p_ehcache,p_jgroups,p_redis)
-
-lazy val api = (project in file("api"))
   .settings(
-    name := "beangle-cache-api",
+    name := "beangle-cache",
     common,
-    libraryDependencies ++= commonDeps
+    libraryDependencies ++= Seq(beangle_commons),
+    libraryDependencies ++= Seq(logback_classic % "test", logback_core % "test", scalatest),
+    libraryDependencies ++= Seq(caffeine % "optional"),
+    libraryDependencies ++= Seq(ehcache % "optional"),
+    libraryDependencies ++= Seq(jgroups % "optional"),
+    libraryDependencies ++= Seq(jedis % "optional")
   )
 
-lazy val p_caffeine = (project in file("caffeine"))
-  .settings(
-    name := "beangle-cache-caffeine",
-    common,
-    libraryDependencies ++= (commonDeps ++ Seq(caffeine))
-  ).dependsOn(api)
-
-lazy val p_ehcache = (project in file("ehcache"))
-  .settings(
-    name := "beangle-cache-ehcache",
-    common,
-    libraryDependencies ++= (commonDeps ++Seq(ehcache))
-  ).dependsOn(api)
-
-lazy val p_jgroups = (project in file("jgroups"))
-  .settings(
-    name := "beangle-cache-jgroups",
-    common,
-    libraryDependencies ++= (commonDeps ++ Seq(jgroups)),
-  ).dependsOn(api)
-
-lazy val p_redis = (project in file("redis"))
-  .settings(
-    name := "beangle-cache-redis",
-    common,
-    libraryDependencies ++= (commonDeps ++ Seq(jedis)),
-  ).dependsOn(api)
-
-publish / skip := true
