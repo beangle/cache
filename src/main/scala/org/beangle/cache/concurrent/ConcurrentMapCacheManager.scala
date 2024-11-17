@@ -17,7 +17,7 @@
 
 package org.beangle.cache.concurrent
 
-import org.beangle.cache.{ Cache, CacheManager }
+import org.beangle.commons.cache.{ Cache, CacheManager }
 
 /**
  * Concurrent Map Cache Manager.

@@ -17,13 +17,14 @@
 
 package org.beangle.cache.jgroups
 
-import java.net.URL
-
-import org.beangle.cache.{Broadcaster, BroadcasterBuilder, CacheManager, EvictMessage}
+import org.beangle.cache.{Broadcaster, BroadcasterBuilder, EvictMessage}
 import org.beangle.commons.bean.Initializing
+import org.beangle.commons.cache.CacheManager
 import org.beangle.commons.io.BinarySerializer
 import org.beangle.commons.logging.Logging
 import org.jgroups.{BytesMessage, JChannel, Message, Receiver}
+
+import java.net.URL
 
 class JGroupsBroadcasterBuilder(networkConfigUrl: URL, serializer: BinarySerializer) extends BroadcasterBuilder {
   def build(channel: String, localManager: CacheManager): Broadcaster = {

@@ -17,7 +17,7 @@
 
 package org.beangle.cache.concurrent
 
-import org.beangle.cache.Cache
+import org.beangle.commons.cache.Cache
 
 /**
   * Cache based Concurrent Map.

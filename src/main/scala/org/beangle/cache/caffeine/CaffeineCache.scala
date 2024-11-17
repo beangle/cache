@@ -17,7 +17,7 @@
 
 package org.beangle.cache.caffeine
 
-import org.beangle.cache.Cache
+import org.beangle.commons.cache.Cache
 
 import com.github.benmanes.caffeine.cache.{ Cache => CCache }
 import org.beangle.commons.lang.Objects

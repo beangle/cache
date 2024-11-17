@@ -17,13 +17,14 @@
 
 package org.beangle.cache.redis
 
-import org.beangle.cache.{AbstractCacheManager, Cache}
+import org.beangle.cache.AbstractCacheManager
+import org.beangle.commons.cache.Cache
 import org.beangle.commons.io.BinarySerializer
 import redis.clients.jedis.JedisPool
 
 /**
-  * @author chaostone
-  */
+ * @author chaostone
+ */
 class RedisCacheManager(pool: JedisPool, serializer: BinarySerializer, autoCreate: Boolean = true)
   extends AbstractCacheManager(autoCreate) {
 

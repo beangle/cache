@@ -17,8 +17,9 @@
 
 package org.beangle.cache.ehcache
 
-import org.beangle.cache.{AbstractCacheManager, Broadcaster, BroadcasterBuilder, Cache}
+import org.beangle.cache.{AbstractCacheManager, Broadcaster, BroadcasterBuilder}
 import org.beangle.commons.bean.Initializing
+import org.beangle.commons.cache.Cache
 import org.ehcache.config.builders.CacheEventListenerConfigurationBuilder
 import org.ehcache.event.EventType
 

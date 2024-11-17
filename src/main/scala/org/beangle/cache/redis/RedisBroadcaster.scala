@@ -18,8 +18,9 @@
 package org.beangle.cache.redis
 
 import org.beangle.cache.chain.ChainedManager
-import org.beangle.cache.{Broadcaster, BroadcasterBuilder, CacheManager, EvictMessage}
+import org.beangle.cache.{Broadcaster, BroadcasterBuilder, EvictMessage}
 import org.beangle.commons.bean.Initializing
+import org.beangle.commons.cache.CacheManager
 import org.beangle.commons.io.BinarySerializer
 import org.beangle.commons.logging.Logging
 import redis.clients.jedis.exceptions.JedisConnectionException

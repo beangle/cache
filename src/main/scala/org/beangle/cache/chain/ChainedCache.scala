@@ -17,7 +17,7 @@
 
 package org.beangle.cache.chain
 
-import org.beangle.cache.Cache
+import org.beangle.commons.cache.Cache
 
 /**
  * @author chaostone

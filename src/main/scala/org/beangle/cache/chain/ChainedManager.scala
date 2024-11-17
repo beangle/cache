@@ -17,6 +17,6 @@
 
 package org.beangle.cache.chain
 
-import org.beangle.cache.CacheManager
+import org.beangle.commons.cache.CacheManager
 
 trait ChainedManager extends CacheManager

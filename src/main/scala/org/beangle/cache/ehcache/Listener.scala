@@ -17,7 +17,8 @@
 
 package org.beangle.cache.ehcache
 
-import org.beangle.cache.{Broadcaster, Cache}
+import org.beangle.cache.Broadcaster
+import org.beangle.commons.cache.Cache
 import org.ehcache.event.{CacheEvent, CacheEventListener}
 
 /**
@@ -26,7 +27,7 @@ import org.ehcache.event.{CacheEvent, CacheEventListener}
 object Listener {
 
   class EvictionBroadcaster(broadcaster: Broadcaster, cacheName: String)
-      extends CacheEventListener[Any, Any] {
+    extends CacheEventListener[Any, Any] {
     override def onEvent(event: CacheEvent[_, _]): Unit = {
       broadcaster.publishEviction(cacheName, event.getKey)
     }

@@ -17,17 +17,18 @@
 
 package org.beangle.cache.ehcache
 
-import java.{util => ju}
-
 import org.beangle.cache.chain.{ChainedCache, ChainedManager}
-import org.beangle.cache._
+import org.beangle.cache.{AbstractCacheManager, Broadcaster, BroadcasterBuilder}
 import org.beangle.commons.bean.Initializing
+import org.beangle.commons.cache.*
 import org.ehcache.config.builders.CacheEventListenerConfigurationBuilder
 import org.ehcache.event.EventType
 
+import java.util as ju
+
 /**
-  * @author chaostone
-  */
+ * @author chaostone
+ */
 class EhCacheChainedManager(ehManager: EhCacheManager, targetManager: CacheManager, autoCreate: Boolean)
   extends AbstractCacheManager(autoCreate) with Initializing with ChainedManager {
 

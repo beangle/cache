@@ -17,10 +17,9 @@
 
 package org.beangle.cache.ehcache
 
-import java.net.URL
-
-import org.beangle.cache.{AbstractCacheManager, Cache}
+import org.beangle.cache.AbstractCacheManager
 import org.beangle.commons.bean.Initializing
+import org.beangle.commons.cache.Cache
 import org.beangle.commons.lang.ClassLoaders
 import org.beangle.commons.logging.Logging
 import org.ehcache.config.CacheConfiguration
@@ -28,6 +27,8 @@ import org.ehcache.config.builders.{CacheConfigurationBuilder, CacheManagerBuild
 import org.ehcache.core.config.DefaultConfiguration
 import org.ehcache.spi.service.ServiceCreationConfiguration
 import org.ehcache.xml.XmlConfiguration
+
+import java.net.URL
 
 /**
  * @author chaostone
