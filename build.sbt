@@ -3,7 +3,7 @@ import org.beangle.parent.Settings.*
 import sbt.Keys.*
 
 ThisBuild / organization := "org.beangle.cache"
-ThisBuild / version := "0.1.16-SNAPSHOT"
+ThisBuild / version := "0.1.16"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -25,7 +25,7 @@ ThisBuild / description := "The Beangle Cache Library"
 ThisBuild / homepage := Some(url("https://beangle.github.io/cache/index.html"))
 ThisBuild / resolvers += Resolver.mavenLocal
 
-val beangle_commons = "org.beangle.commons" % "beangle-commons" % "5.6.30"
+val beangle_commons = "org.beangle.commons" % "beangle-commons" % "5.6.32"
 
 lazy val root = (project in file("."))
   .settings(
