@@ -20,28 +20,28 @@ package org.beangle.cache.redis
 import org.beangle.cache.AbstractCacheManager
 import org.beangle.commons.cache.Cache
 import org.beangle.commons.io.BinarySerializer
-import redis.clients.jedis.JedisPool
+import redis.clients.jedis.RedisClient
 
 /**
  * @author chaostone
  */
-class RedisCacheManager(pool: JedisPool, serializer: BinarySerializer, autoCreate: Boolean = true)
+class RedisCacheManager(client: RedisClient, serializer: BinarySerializer, autoCreate: Boolean = true)
   extends AbstractCacheManager(autoCreate) {
 
   var ttl: Int = -1
 
   protected override def newCache[K, V](name: String, keyType: Class[K], valueType: Class[V]): Cache[K, V] = {
     registerClass(keyType, valueType)
-    new RedisCache(name, pool, serializer, keyType, valueType, ttl)
+    new RedisCache(name, client, serializer, keyType, valueType, ttl)
   }
 
   protected override def findCache[K, V](name: String, keyType: Class[K], valueType: Class[V]): Cache[K, V] = {
     registerClass(keyType, valueType)
-    new RedisCache(name, pool, serializer, keyType, valueType, ttl)
+    new RedisCache(name, client, serializer, keyType, valueType, ttl)
   }
 
   override def destroy(): Unit = {
-    pool.destroy()
+    client.close()
   }
 
   private def registerClass(keyType: Class[_], valueType: Class[_]): Unit = {

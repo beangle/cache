@@ -25,6 +25,11 @@ import org.beangle.commons.lang.ClassLoaders
 
 import java.util.concurrent.TimeUnit
 
+/** Caffeine的缓存管理器
+ * 配置可以从META-INF/caffeine.properties加载，每个cache一行，每行中包含多个属性配置，用逗号分割。
+ *
+ * @param autoCreate
+ */
 class CaffeineCacheManager(autoCreate: Boolean = false) extends AbstractCacheManager(autoCreate) {
 
   private val specs = ClassLoaders.getResource("META-INF/caffeine.properties") match {

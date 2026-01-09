@@ -19,16 +19,16 @@ package org.beangle.cache.redis
 
 import org.beangle.commons.cache.Cache
 import org.beangle.commons.io.BinarySerializer
-import redis.clients.jedis.JedisPool
+import redis.clients.jedis.RedisClient
 import redis.clients.jedis.params.SetParams
 
 object RedisCache {
 
   def buildKey(name: String, key: Any): String = {
     key match {
-      case n: Number       => name + ":I:" + n
+      case n: Number => name + ":I:" + n
       case s: CharSequence => name + ":S:" + s
-      case o: Any          => name + ":O:" + o
+      case o: Any => name + ":O:" + o
     }
   }
 }
@@ -36,122 +36,77 @@ object RedisCache {
 /**
  * @author chaostone
  */
-class RedisCache[K, V](name: String, pool: JedisPool, serializer: BinarySerializer,
-  ktype: Class[K], vtype: Class[V], val ttl: Long = -1)
-    extends Cache[K, V] {
+class RedisCache[K, V](name: String, client: RedisClient, serializer: BinarySerializer,
+                       ktype: Class[K], vtype: Class[V], val ttl: Long = -1)
+  extends Cache[K, V] {
 
-  import RedisCache._
+  import RedisCache.*
 
   override def get(key: K): Option[V] = {
-    val cache = pool.getResource
-    try {
-      val b = cache.get(buildKey(name, key).getBytes)
-      if (b == null) None else Some(serializer.asObject(vtype, b))
-    } finally {
-      cache.close()
-    }
+    val b = client.get(buildKey(name, key).getBytes)
+    if (b == null) None else Some(serializer.asObject(vtype, b))
   }
 
   override def put(key: K, value: V): Unit = {
-    val cache = pool.getResource
-    try {
-      val redisKey = buildKey(name, key).getBytes
-      if (ttl > 0) {
-        cache.setex(redisKey, ttl, serializer.asBytes(value))
-      } else {
-        cache.set(redisKey, serializer.asBytes(value))
-      }
-    } finally {
-      cache.close()
+    val redisKey = buildKey(name, key).getBytes
+    if (ttl > 0) {
+      client.setex(redisKey, ttl, serializer.asBytes(value))
+    } else {
+      client.set(redisKey, serializer.asBytes(value))
     }
   }
 
   override def putIfAbsent(key: K, value: V): Boolean = {
-    val cache = pool.getResource
-    try {
-      val redisKey = buildKey(name, key).getBytes
-      if (ttl > 0) {
-        cache.set(redisKey, serializer.asBytes(value), SetParams.setParams().nx().ex(ttl)) == "OK"
-      } else {
-        cache.set(redisKey, serializer.asBytes(value), SetParams.setParams().nx()) == "OK"
-      }
-      false
-    } finally {
-      cache.close()
+    val redisKey = buildKey(name, key).getBytes
+    if (ttl > 0) {
+      client.set(redisKey, serializer.asBytes(value), SetParams.setParams().nx().ex(ttl)) == "OK"
+    } else {
+      client.set(redisKey, serializer.asBytes(value), SetParams.setParams().nx()) == "OK"
     }
+    false
   }
 
   override def touch(key: K): Boolean = {
-    val cache = pool.getResource
-    try {
-      cache.expire(buildKey(name, key).getBytes, ttl) > 0
-    } finally {
-      cache.close()
-    }
+    client.expire(buildKey(name, key).getBytes, ttl) > 0
   }
 
   def replace(key: K, value: V): Option[V] = {
-    val cache = pool.getResource
-    try {
-      val redisKey = buildKey(name, key).getBytes
-      val o = cache.get(redisKey)
-      if (ttl > 0) {
-        cache.setex(redisKey, ttl, serializer.asBytes(value))
-      } else {
-        cache.set(redisKey, serializer.asBytes(value))
-      }
-      if (o == null) None else Some(serializer.asBytes(o).asInstanceOf[V])
-    } finally {
-      cache.close()
+    val redisKey = buildKey(name, key).getBytes
+    val o = client.get(redisKey)
+    if (ttl > 0) {
+      client.setex(redisKey, ttl, serializer.asBytes(value))
+    } else {
+      client.set(redisKey, serializer.asBytes(value))
     }
+    if (o == null) None else Some(serializer.asBytes(o).asInstanceOf[V])
   }
 
   def replace(key: K, oldvalue: V, newvalue: V): Boolean = {
-    val cache = pool.getResource
-    try {
-      val redisKey = buildKey(name, key).getBytes
-      val o = cache.get(redisKey)
-      if (o != null && o == serializer.asBytes(oldvalue)) {
-        if (ttl > 0) {
-          cache.setex(redisKey, ttl, serializer.asBytes(newvalue))
-        } else {
-          cache.set(redisKey, serializer.asBytes(newvalue))
-        }
-        true
+    val redisKey = buildKey(name, key).getBytes
+    val o = client.get(redisKey)
+    if (o != null && o == serializer.asBytes(oldvalue)) {
+      if (ttl > 0) {
+        client.setex(redisKey, ttl, serializer.asBytes(newvalue))
       } else {
-        false
+        client.set(redisKey, serializer.asBytes(newvalue))
       }
-    } finally {
-      cache.close()
+      true
+    } else {
+      false
     }
   }
 
   override def exists(key: K): Boolean = {
-    val cache = pool.getResource
-    try {
-      cache.exists(buildKey(name, key).getBytes)
-    } finally {
-      cache.close()
-    }
+    client.exists(buildKey(name, key).getBytes)
   }
 
   override def evict(key: K): Boolean = {
-    val cache = pool.getResource
-    try {
-      cache.del(buildKey(name, key)) > 0
-    } finally {
-      cache.close()
-    }
+    client.del(buildKey(name, key)) > 0
   }
 
   override def clear(): Unit = {
-    val cache = pool.getResource
-    try {
-      val keys = cache.keys(name + ":*").asInstanceOf[java.util.List[_]]
-      cache.del(keys.toArray.asInstanceOf[Array[String]]: _*)
-    } finally {
-      cache.close()
-    }
+    val keys = client.keys(name + ":*").asInstanceOf[java.util.List[_]]
+    client.del(keys.toArray.asInstanceOf[Array[String]]: _*)
   }
 
   override def tti: Long = {

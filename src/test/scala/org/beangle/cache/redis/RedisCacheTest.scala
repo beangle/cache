@@ -21,16 +21,16 @@ import org.beangle.commons.io.DefaultBinarySerializer
 
 object RedisCacheTest {
   def main(args: Array[String]): Unit = {
-    val pool = JedisPoolFactory.connect(Map.empty)
+    val client = RedisClientFactory.build(Map.empty)
     DefaultBinarySerializer.registerClass(classOf[String])
-    val cache = new RedisCache[String, String]("test", pool, DefaultBinarySerializer,
+    val cache = new RedisCache[String, String]("test", client, DefaultBinarySerializer,
       classOf[String], classOf[String])
     (0 until 1000) foreach { i =>
       cache.put(i.toString, i.toString)
     }
     println(cache.get("3"))
-    println("idle:"+ pool.getNumIdle)
-    println("active:" + pool.getNumActive)
-    println("await:" + pool.getNumWaiters)
+    println("idle:" + client.getPool.getNumIdle)
+    println("active:" + client.getPool.getNumActive)
+    println("await:" + client.getPool.getNumWaiters)
   }
 }

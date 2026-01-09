@@ -24,15 +24,15 @@ import org.beangle.commons.cache.CacheManager
 import org.beangle.commons.io.BinarySerializer
 import org.beangle.commons.logging.Logging
 import redis.clients.jedis.exceptions.JedisConnectionException
-import redis.clients.jedis.{BinaryJedisPubSub, JedisPool}
 import redis.clients.jedis.util.SafeEncoder
+import redis.clients.jedis.{BinaryJedisPubSub, RedisClient}
 
-class RedisBroadcasterBuilder(pool: JedisPool, serializer: BinarySerializer) extends BroadcasterBuilder {
+class RedisBroadcasterBuilder(client: RedisClient, serializer: BinarySerializer) extends BroadcasterBuilder {
   def build(channel: String, localManager: CacheManager): Broadcaster = {
     if (localManager.isInstanceOf[ChainedManager]) {
       throw new RuntimeException("Local cache manager couldn't be chained.")
     }
-    val broadcaster = new RedisBroadcaster(SafeEncoder.encode(channel), pool, serializer, localManager)
+    val broadcaster = new RedisBroadcaster(SafeEncoder.encode(channel), client, serializer, localManager)
     broadcaster.init()
     broadcaster
   }
@@ -43,9 +43,9 @@ object SubscriberDaemon {
 }
 
 /**
-  * Subscribe and on receive message thread
-  */
-class SubscriberDaemon(pool: JedisPool, broadcaster: RedisBroadcaster, channel: Array[Byte]) extends Runnable with Logging {
+ * Subscribe and on receive message thread
+ */
+class SubscriberDaemon(client: RedisClient, broadcaster: RedisBroadcaster, channel: Array[Byte]) extends Runnable with Logging {
   override def run(): Unit = {
     SubscriberDaemon.synchronized {
       if (SubscriberDaemon.running) {
@@ -58,10 +58,8 @@ class SubscriberDaemon(pool: JedisPool, broadcaster: RedisBroadcaster, channel: 
     var i = 0
     while (true) {
       try {
-        val jedis = pool.getResource
         logger.info("Subscribing redis on channel:" + SafeEncoder.encode(channel))
-        jedis.subscribe(broadcaster, channel)
-        jedis.close()
+        client.subscribe(broadcaster, channel)
       } catch {
         case e: JedisConnectionException =>
           e.printStackTrace()
@@ -76,16 +74,16 @@ class SubscriberDaemon(pool: JedisPool, broadcaster: RedisBroadcaster, channel: 
 }
 
 /**
-  * @author chaostone
-  */
-class RedisBroadcaster(channel: Array[Byte], pool: JedisPool, serializer: BinarySerializer, localManager: CacheManager)
+ * @author chaostone
+ */
+class RedisBroadcaster(channel: Array[Byte], client: RedisClient, serializer: BinarySerializer, localManager: CacheManager)
   extends BinaryJedisPubSub with Broadcaster with Initializing {
 
   var subscriber: Thread = _
 
   def init(): Unit = {
     //the subscription will block current thread,so we start a new one.
-    subscriber = new Thread(new SubscriberDaemon(pool, this, channel))
+    subscriber = new Thread(new SubscriberDaemon(client, this, channel))
     subscriber.setName("RedisSubscriberDaemon")
     subscriber.setDaemon(true)
     subscriber.start()
@@ -106,22 +104,11 @@ class RedisBroadcaster(channel: Array[Byte], pool: JedisPool, serializer: Binary
   }
 
   override def publishEviction(cache: String, key: Any): Unit = {
-    val jedis = pool.getResource
-    try {
-      jedis.publish(channel, serializer.asBytes(new EvictMessage(cache, key)))
-    } finally {
-      jedis.close()
-    }
+    client.publish(channel, serializer.asBytes(new EvictMessage(cache, key)))
   }
 
   override def publishClear(cache: String): Unit = {
-    val jedis = pool.getResource
-    try {
-      jedis.publish(channel, serializer.asBytes(new EvictMessage(cache, null)))
-    } finally {
-      jedis.close()
-    }
-
+    client.publish(channel, serializer.asBytes(new EvictMessage(cache, null)))
   }
 
 }

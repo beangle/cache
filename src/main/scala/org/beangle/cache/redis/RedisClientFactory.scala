@@ -18,34 +18,36 @@
 package org.beangle.cache.redis
 
 import org.beangle.commons.bean.Factory
-import redis.clients.jedis.{JedisPool, JedisPoolConfig}
+import redis.clients.jedis.{ConnectionPoolConfig, DefaultJedisClientConfig, RedisClient}
 
-import java.time.Duration
+object RedisClientFactory {
 
-object JedisPoolFactory {
+  def build(props: Map[String, String]): RedisClient = {
 
-  def connect(props: Map[String, String]): JedisPool = {
-    val config = new JedisPoolConfig()
     val host = getProperty(props, "host", "127.0.0.1")
+    val user = props.getOrElse("user", null)
     val password = props.getOrElse("password", null)
     val port = getProperty(props, "port", 6379)
     val timeout = getProperty(props, "timeout", 2000)
     val database = getProperty(props, "database", 0)
 
-    config.setBlockWhenExhausted(getProperty(props, "blockWhenExhausted", true))
-    config.setMaxIdle(getProperty(props, "maxIdle", 10))
-    config.setMinIdle(getProperty(props, "minIdle", 5))
-    config.setMaxTotal(getProperty(props, "maxTotal", 100))
-    config.setMaxWait(Duration.ofMillis(getProperty(props, "maxWait", 50)))
-    config.setTestWhileIdle(getProperty(props, "testWhileIdle", false))
-    config.setTestOnBorrow(getProperty(props, "testOnBorrow", true))
-    config.setTestOnReturn(getProperty(props, "testOnReturn", false))
-    config.setNumTestsPerEvictionRun(getProperty(props, "numTestsPerEvictionRun", 10))
-    config.setSoftMinEvictableIdleDuration(Duration.ofMillis(getProperty(props, "softMinEvictableIdleTimeMillis", 10)))
-    config.setTimeBetweenEvictionRuns(Duration.ofMillis(getProperty(props, "timeBetweenEvictionRunsMillis", 10)))
-    config.setLifo(getProperty(props, "lifo", false))
+    val clientConfig = DefaultJedisClientConfig.builder().password(password)
+      .database(0)
+      .timeoutMillis(2000)
+      .user(user)
+      .password(password)
+      .build()
 
-    new JedisPool(config, host, port, timeout, password, database)
+    val poolConfig = new ConnectionPoolConfig
+    poolConfig.setMaxIdle(getProperty(props, "minIdle", 2))
+    poolConfig.setMinIdle(getProperty(props, "maxIdle", 5))
+    poolConfig.setMaxTotal(getProperty(props, "maxTotal", 50))
+
+    val builder = RedisClient.builder()
+    builder.hostAndPort(host, port)
+      .clientConfig(clientConfig)
+      .poolConfig(poolConfig)
+      .build()
   }
 
   private def getProperty(props: Map[String, String], key: String, defaultValue: String): String = {
@@ -70,12 +72,8 @@ object JedisPoolFactory {
 /**
  * @author chaostone
  */
-class JedisPoolFactory(props: Map[String, String]) extends Factory[JedisPool] {
+class RedisClientFactory(props: Map[String, String]) extends Factory[RedisClient] {
 
-  private val pool = JedisPoolFactory.connect(props)
-
-  def result: JedisPool = {
-    pool
-  }
+  val result = RedisClientFactory.build(props)
 
 }
