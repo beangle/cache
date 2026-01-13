@@ -31,7 +31,7 @@ lazy val root = (project in file("."))
   .settings(
     name := "beangle-cache",
     common,
-    libraryDependencies ++= Seq(beangle_commons),
+    libraryDependencies ++= Seq(beangle_commons, slf4j),
     libraryDependencies ++= Seq(logback_classic % "test", scalatest),
     libraryDependencies ++= Seq(caffeine % "optional"),
     libraryDependencies ++= Seq(ehcache % "optional"),
