@@ -18,28 +18,36 @@
 package org.beangle.cache
 
 import org.beangle.commons.cache.{Cache, CacheManager}
+import org.beangle.commons.concurrent.Locks
+
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * @author chaostone
  */
 abstract class AbstractCacheManager(val autoCreate: Boolean) extends CacheManager {
   private var registry = Map.empty[String, Cache[_, _]]
+  //读写控制，多个读写者，读不到可以写
+  private val rwLock = new ReentrantReadWriteLock()
 
   /**
    * Return the cache associated with the given name.
    */
   override final def getCache[K, V](name: String, keyType: Class[K], valueType: Class[V]): Cache[K, V] = {
-    registry.get(name) match {
+    Locks.withReadLock(rwLock) {
+      registry.get(name)
+    } match {
       case Some(cache) => cache.asInstanceOf[Cache[K, V]]
       case None =>
-        registry.synchronized {
+        Locks.withWriteLock(rwLock) {
+          //二次读取（防止并发重复生成）
           registry.get(name) match {
             case Some(cache) => cache.asInstanceOf[Cache[K, V]]
             case None =>
               if (autoCreate) {
                 val newcache = newCache(name, keyType, valueType)
                 registry += (name -> newcache)
-                newcache.asInstanceOf[Cache[K, V]]
+                newcache
               } else {
                 val existed = findCache(name, keyType, valueType)
                 if (null == existed) throw new RuntimeException(s"Cannot find cache $name")

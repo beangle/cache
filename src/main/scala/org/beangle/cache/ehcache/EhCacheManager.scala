@@ -17,11 +17,10 @@
 
 package org.beangle.cache.ehcache
 
-import org.beangle.cache.AbstractCacheManager
+import org.beangle.cache.{AbstractCacheManager, CacheLogger}
 import org.beangle.commons.bean.Initializing
 import org.beangle.commons.cache.Cache
 import org.beangle.commons.lang.ClassLoaders
-import org.beangle.commons.logging.Logging
 import org.ehcache.config.CacheConfiguration
 import org.ehcache.config.builders.{CacheConfigurationBuilder, CacheManagerBuilder}
 import org.ehcache.core.config.DefaultConfiguration
@@ -33,8 +32,8 @@ import java.net.URL
 /**
  * @author chaostone
  */
-class EhCacheManager(val name: String = "ehcache", autoCreate: Boolean = false) extends AbstractCacheManager(autoCreate)
-  with Initializing with Logging {
+class EhCacheManager(val name: String = "ehcache", autoCreate: Boolean = false)
+  extends AbstractCacheManager(autoCreate), Initializing {
 
   var configUrl: URL = _
 
@@ -47,7 +46,7 @@ class EhCacheManager(val name: String = "ehcache", autoCreate: Boolean = false) 
     if (null == configUrl) {
       ClassLoaders.getResource(name + ".xml") match {
         case Some(u) => configUrl = u
-        case None => logger.warn(s"Cannot find $name.xml in classpath.")
+        case None => CacheLogger.warn(s"Cannot find $name.xml in classpath.")
       }
     }
     innerManager =

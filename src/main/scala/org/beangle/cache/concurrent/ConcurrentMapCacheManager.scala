@@ -17,7 +17,10 @@
 
 package org.beangle.cache.concurrent
 
-import org.beangle.commons.cache.{ Cache, CacheManager }
+import org.beangle.commons.cache.{Cache, CacheManager}
+import org.beangle.commons.concurrent.Locks
+
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Concurrent Map Cache Manager.
@@ -29,12 +32,15 @@ import org.beangle.commons.cache.{ Cache, CacheManager }
 class ConcurrentMapCacheManager(val name: String = "concurrent") extends CacheManager {
 
   private var caches = Map.empty[String, ConcurrentMapCache[_, _]]
+  private val rwLock = new ReentrantReadWriteLock()
 
-  override def getCache[K , V](name: String, keyType: Class[K], valueType: Class[V]): Cache[K, V] = {
-    caches.get(name) match {
+  override def getCache[K, V](name: String, keyType: Class[K], valueType: Class[V]): Cache[K, V] = {
+    Locks.withReadLock(rwLock) {
+      caches.get(name)
+    } match {
       case Some(cache) => cache.asInstanceOf[Cache[K, V]]
       case None =>
-        caches.synchronized {
+        Locks.withWriteLock(rwLock) {
           caches.get(name) match {
             case Some(cache) => cache.asInstanceOf[Cache[K, V]]
             case None =>

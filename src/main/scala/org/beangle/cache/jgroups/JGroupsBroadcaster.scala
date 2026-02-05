@@ -17,11 +17,10 @@
 
 package org.beangle.cache.jgroups
 
-import org.beangle.cache.{Broadcaster, BroadcasterBuilder, EvictMessage}
+import org.beangle.cache.{Broadcaster, BroadcasterBuilder, CacheLogger, EvictMessage}
 import org.beangle.commons.bean.Initializing
 import org.beangle.commons.cache.CacheManager
 import org.beangle.commons.io.BinarySerializer
-import org.beangle.commons.logging.Logging
 import org.jgroups.{BytesMessage, JChannel, Message, Receiver}
 
 import java.net.URL
@@ -38,7 +37,7 @@ class JGroupsBroadcasterBuilder(networkConfigUrl: URL, serializer: BinarySeriali
  * @author chaostone
  */
 class JGroupsBroadcaster(channelName: String, channel: JChannel, serializer: BinarySerializer, localManager: CacheManager)
-  extends Receiver with Broadcaster with Initializing with Logging {
+  extends Receiver, Broadcaster, Initializing {
 
   def init(): Unit = {
     channel.setReceiver(this)
@@ -64,8 +63,7 @@ class JGroupsBroadcaster(channelName: String, channel: JChannel, serializer: Bin
     try {
       channel.send(new BytesMessage(null, serializer.asBytes(new EvictMessage(cache, key))))
     } catch {
-      case e: Throwable =>
-        logger.error("Unable to evict,cache=" + cache + " key=" + key, e);
+      case e: Throwable => CacheLogger.error("Unable to evict,cache=" + cache + " key=" + key, e);
     }
   }
 
@@ -73,8 +71,7 @@ class JGroupsBroadcaster(channelName: String, channel: JChannel, serializer: Bin
     try {
       channel.send(new BytesMessage(null, serializer.asBytes(new EvictMessage(cache, null))))
     } catch {
-      case e: Throwable =>
-        logger.error("Unable to clear cache :" + cache, e);
+      case e: Throwable => CacheLogger.error("Unable to clear cache :" + cache, e);
     }
   }
 

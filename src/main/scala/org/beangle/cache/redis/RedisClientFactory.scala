@@ -74,6 +74,7 @@ object RedisClientFactory {
  */
 class RedisClientFactory(props: Map[String, String]) extends Factory[RedisClient] {
 
-  val result = RedisClientFactory.build(props)
+  private val result = RedisClientFactory.build(props)
 
+  override def getObject: RedisClient = result
 }

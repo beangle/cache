@@ -18,14 +18,17 @@
 package org.beangle.cache.redis
 
 import org.beangle.cache.chain.ChainedManager
-import org.beangle.cache.{Broadcaster, BroadcasterBuilder, EvictMessage}
+import org.beangle.cache.redis.SubscriberDaemon.*
+import org.beangle.cache.{Broadcaster, BroadcasterBuilder, CacheLogger, EvictMessage}
 import org.beangle.commons.bean.Initializing
 import org.beangle.commons.cache.CacheManager
+import org.beangle.commons.concurrent.Locks
 import org.beangle.commons.io.BinarySerializer
-import org.beangle.commons.logging.Logging
 import redis.clients.jedis.exceptions.JedisConnectionException
 import redis.clients.jedis.util.SafeEncoder
 import redis.clients.jedis.{BinaryJedisPubSub, RedisClient}
+
+import java.util.concurrent.locks.ReentrantLock
 
 class RedisBroadcasterBuilder(client: RedisClient, serializer: BinarySerializer) extends BroadcasterBuilder {
   def build(channel: String, localManager: CacheManager): Broadcaster = {
@@ -39,35 +42,35 @@ class RedisBroadcasterBuilder(client: RedisClient, serializer: BinarySerializer)
 }
 
 object SubscriberDaemon {
-  var running = false
+  private var running = false
+  private val runningLock = new ReentrantLock()
 }
 
 /**
  * Subscribe and on receive message thread
  */
-class SubscriberDaemon(client: RedisClient, broadcaster: RedisBroadcaster, channel: Array[Byte]) extends Runnable with Logging {
+class SubscriberDaemon(client: RedisClient, broadcaster: RedisBroadcaster, channel: Array[Byte]) extends Runnable {
   override def run(): Unit = {
-    SubscriberDaemon.synchronized {
-      if (SubscriberDaemon.running) {
-        logger.warn("SubscriberDaemon is running,opereration aborted.")
-        return
+    Locks.withLock(runningLock) {
+      if (running) {
+        CacheLogger.warn("SubscriberDaemon is running,opereration aborted.")
       } else {
-        SubscriberDaemon.running = true
-      }
-    }
-    var i = 0
-    while (true) {
-      try {
-        logger.info("Subscribing redis on channel:" + SafeEncoder.encode(channel))
-        client.subscribe(broadcaster, channel)
-      } catch {
-        case e: JedisConnectionException =>
-          e.printStackTrace()
-          i += 1
-          if (i % 5 == 0) {
-            logger.error("Connect redis failed after 5 tries.")
-            Thread.sleep(100000)
+        running = true
+        var i = 0
+        while (true) {
+          try {
+            CacheLogger.info("Subscribing redis on channel:" + SafeEncoder.encode(channel))
+            client.subscribe(broadcaster, channel)
+          } catch {
+            case e: JedisConnectionException =>
+              e.printStackTrace()
+              i += 1
+              if (i % 5 == 0) {
+                CacheLogger.error("Connect redis failed after 5 tries.")
+                Thread.sleep(100000)
+              }
           }
+        }
       }
     }
   }
