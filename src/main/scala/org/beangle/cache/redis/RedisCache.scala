@@ -17,6 +17,7 @@
 
 package org.beangle.cache.redis
 
+import org.beangle.cache.redis.RedisCache.buildKey
 import org.beangle.commons.cache.Cache
 import org.beangle.commons.io.BinarySerializer
 import redis.clients.jedis.RedisClient
@@ -40,7 +41,6 @@ class RedisCache[K, V](name: String, client: RedisClient, serializer: BinarySeri
                        ktype: Class[K], vtype: Class[V], val ttl: Long = -1)
   extends Cache[K, V] {
 
-  import RedisCache.*
 
   override def get(key: K): Option[V] = {
     val b = client.get(buildKey(name, key).getBytes)
@@ -48,21 +48,11 @@ class RedisCache[K, V](name: String, client: RedisClient, serializer: BinarySeri
   }
 
   override def put(key: K, value: V): Unit = {
-    val redisKey = buildKey(name, key).getBytes
-    if (ttl > 0) {
-      client.setex(redisKey, ttl, serializer.asBytes(value))
-    } else {
-      client.set(redisKey, serializer.asBytes(value))
-    }
+    setBytes(buildKey(name, key).getBytes, serializer.asBytes(value))
   }
 
   override def putIfAbsent(key: K, value: V): Boolean = {
-    val redisKey = buildKey(name, key).getBytes
-    if (ttl > 0) {
-      client.set(redisKey, serializer.asBytes(value), SetParams.setParams().nx().ex(ttl)) == "OK"
-    } else {
-      client.set(redisKey, serializer.asBytes(value), SetParams.setParams().nx()) == "OK"
-    }
+    setBytes(buildKey(name, key).getBytes, serializer.asBytes(value), ifAbsent = true)
     false
   }
 
@@ -73,11 +63,7 @@ class RedisCache[K, V](name: String, client: RedisClient, serializer: BinarySeri
   def replace(key: K, value: V): Option[V] = {
     val redisKey = buildKey(name, key).getBytes
     val o = client.get(redisKey)
-    if (ttl > 0) {
-      client.setex(redisKey, ttl, serializer.asBytes(value))
-    } else {
-      client.set(redisKey, serializer.asBytes(value))
-    }
+    setBytes(redisKey, serializer.asBytes(value))
     if (o == null) None else Some(serializer.asBytes(o).asInstanceOf[V])
   }
 
@@ -85,11 +71,7 @@ class RedisCache[K, V](name: String, client: RedisClient, serializer: BinarySeri
     val redisKey = buildKey(name, key).getBytes
     val o = client.get(redisKey)
     if (o != null && o == serializer.asBytes(oldvalue)) {
-      if (ttl > 0) {
-        client.setex(redisKey, ttl, serializer.asBytes(newvalue))
-      } else {
-        client.set(redisKey, serializer.asBytes(newvalue))
-      }
+      setBytes(redisKey, serializer.asBytes(newvalue))
       true
     } else {
       false
@@ -111,5 +93,26 @@ class RedisCache[K, V](name: String, client: RedisClient, serializer: BinarySeri
 
   override def tti: Long = {
     ttl
+  }
+
+  /**
+   * 向 Redis 写入二进制值。
+   *
+   * 当 `ifAbsent` 为 true 或实例 `ttl` > 0 时，使用 SET + SetParams 附加选项；
+   * 否则执行普通 SET。替代 Jedis 7.x 中已废弃的 setex。
+   *
+   * @param key Redis 键
+   * @param value 要写入的二进制值
+   * @param ifAbsent 为 true 时仅当 key 不存在才写入（对应 Redis SET NX）
+   */
+  private def setBytes(key: Array[Byte], value: Array[Byte], ifAbsent: Boolean = false): Unit = {
+    if (ifAbsent || ttl > 0) {
+      var params = SetParams.setParams()
+      if (ifAbsent) params = params.nx()
+      if (ttl > 0) params = params.ex(ttl)
+      client.set(key, value, params)
+    } else {
+      client.set(key, value)
+    }
   }
 }
