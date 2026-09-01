@@ -41,7 +41,6 @@ class RedisCache[K, V](name: String, client: RedisClient, serializer: BinarySeri
                        ktype: Class[K], vtype: Class[V], val ttl: Long = -1)
   extends Cache[K, V] {
 
-
   override def get(key: K): Option[V] = {
     val b = client.get(buildKey(name, key).getBytes)
     if (b == null) None else Some(serializer.asObject(vtype, b))
