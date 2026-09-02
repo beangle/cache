@@ -25,7 +25,7 @@ description := "The Beangle Cache Library"
 homepage := Some(uri("https://beangle.github.io/cache/index.html"))
 resolvers += Resolver.mavenLocal
 
-val beangle_commons = "org.beangle.commons" % "beangle-commons" % "6.3.1"
+val beangle_commons = "org.beangle.commons" % "beangle-commons" % "6.3.2"
 
 lazy val root = (project in file("."))
   .settings(
