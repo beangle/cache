@@ -51,9 +51,7 @@ class CacheAotHints extends AotHintRegistrar {
    *  查询，ConnectionPool/RedisClient 被 Class.forName 与构造器反射使用。 */
   private val jedisPolicy = AotPolicy(Set(
     AotPolicy.Category.PublicConstructors,
-    AotPolicy.Category.PublicMethods,
-    AotPolicy.Category.QueryPublicMethods,
-    AotPolicy.Category.QueryPublicConstructors))
+    AotPolicy.Category.PublicMethods))
 
   override def registering(): Unit = {
     registerCacheImplementations()
@@ -119,6 +117,6 @@ class CacheAotHints extends AotHintRegistrar {
     }
     // Jedis 启动时经 ClassLoader 读取 jar 内 redis/clients/jedis/pom.properties
     // 打印版本，native 镜像里无该资源（日志报错但不影响功能），显式纳入资源配置
-    hints.registerPattern("redis/clients/jedis/pom\\.properties")
+    hints.registerPattern("redis/clients/jedis/pom.properties")
   }
 }
