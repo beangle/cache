@@ -44,7 +44,7 @@ class RedisCacheManager(client: RedisClient, serializer: BinarySerializer, autoC
     client.close()
   }
 
-  private def registerClass(keyType: Class[_], valueType: Class[_]): Unit = {
+  private def registerClass(keyType: Class[?], valueType: Class[?]): Unit = {
     serializer.registerClass(keyType)
     serializer.registerClass(valueType)
   }

@@ -26,7 +26,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
  * @author chaostone
  */
 abstract class AbstractCacheManager(val autoCreate: Boolean) extends CacheManager {
-  private var registry = Map.empty[String, Cache[_, _]]
+  private var registry = Map.empty[String, Cache[?, ?]]
   //读写控制，多个读写者，读不到可以写
   private val rwLock = new ReentrantReadWriteLock()
 

@@ -25,6 +25,7 @@ import org.ehcache.config.builders.CacheEventListenerConfigurationBuilder
 import org.ehcache.event.EventType
 
 import java.util as ju
+import scala.compiletime.uninitialized
 
 /**
  * @author chaostone
@@ -33,8 +34,8 @@ class EhCacheChainedManager(ehManager: EhCacheManager, targetManager: CacheManag
   extends AbstractCacheManager(autoCreate) with Initializing with ChainedManager {
 
   var propagateExpiration: Boolean = false
-  var broadcasterBuilder: BroadcasterBuilder = _
-  private var broadcaster: Broadcaster = _
+  var broadcasterBuilder: BroadcasterBuilder = uninitialized
+  private var broadcaster: Broadcaster = uninitialized
 
   def init(): Unit = {
     broadcaster = broadcasterBuilder.build(ehManager.name, ehManager)
@@ -60,7 +61,7 @@ class EhCacheChainedManager(ehManager: EhCacheManager, targetManager: CacheManag
 
       if (null != broadcaster) {
         val eventTypes = new java.util.HashSet[EventType]
-        eventTypes.addAll(ju.Arrays.asList(EventType.values: _*))
+        eventTypes.addAll(ju.Arrays.asList(EventType.values*))
         if (!propagateExpiration) eventTypes.remove(EventType.EXPIRED)
 
         val broadcasterConfig = CacheEventListenerConfigurationBuilder

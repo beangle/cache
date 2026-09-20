@@ -28,7 +28,7 @@ class CaffeineCacheTest extends AnyFunSpec with Matchers {
       val cache = manager.getCache("test", classOf[Long], classOf[String])
       cache.put(1L, "beijing")
       cache.put(2L, "shanghai")
-      cache.get(1) should be equals ("beijing")
+      cache.get(1) should be `equals` ("beijing")
 
       assert(cache.get(3) == None)
     }

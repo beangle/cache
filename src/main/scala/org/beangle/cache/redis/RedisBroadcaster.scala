@@ -29,6 +29,7 @@ import redis.clients.jedis.util.SafeEncoder
 import redis.clients.jedis.{BinaryJedisPubSub, RedisClient}
 
 import java.util.concurrent.locks.ReentrantLock
+import scala.compiletime.uninitialized
 
 class RedisBroadcasterBuilder(client: RedisClient, serializer: BinarySerializer) extends BroadcasterBuilder {
   def build(channel: String, localManager: CacheManager): Broadcaster = {
@@ -82,7 +83,7 @@ class SubscriberDaemon(client: RedisClient, broadcaster: RedisBroadcaster, chann
 class RedisBroadcaster(channel: Array[Byte], client: RedisClient, serializer: BinarySerializer, localManager: CacheManager)
   extends BinaryJedisPubSub with Broadcaster with Initializing {
 
-  var subscriber: Thread = _
+  var subscriber: Thread = uninitialized
 
   def init(): Unit = {
     //the subscription will block current thread,so we start a new one.

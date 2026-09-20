@@ -28,13 +28,13 @@ object Listener {
 
   class EvictionBroadcaster(broadcaster: Broadcaster, cacheName: String)
     extends CacheEventListener[Any, Any] {
-    override def onEvent(event: CacheEvent[_, _]): Unit = {
+    override def onEvent(event: CacheEvent[?, ?]): Unit = {
       broadcaster.publishEviction(cacheName, event.getKey)
     }
   }
 
   class ChainExpiry(target: Cache[Any, Any]) extends CacheEventListener[Any, Any] {
-    override def onEvent(event: CacheEvent[_, _]): Unit = {
+    override def onEvent(event: CacheEvent[?, ?]): Unit = {
       target.evict(event.getKey)
     }
   }

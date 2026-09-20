@@ -86,8 +86,8 @@ class RedisCache[K, V](name: String, client: RedisClient, serializer: BinarySeri
   }
 
   override def clear(): Unit = {
-    val keys = client.keys(name + ":*").asInstanceOf[java.util.List[_]]
-    client.del(keys.toArray.asInstanceOf[Array[String]]: _*)
+    val keys = client.keys(name + ":*").asInstanceOf[java.util.List[?]]
+    client.del(keys.toArray.asInstanceOf[Array[String]]*)
   }
 
   override def tti: Long = {

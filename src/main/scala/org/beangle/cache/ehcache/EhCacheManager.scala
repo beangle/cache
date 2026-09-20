@@ -28,6 +28,7 @@ import org.ehcache.spi.service.ServiceCreationConfiguration
 import org.ehcache.xml.XmlConfiguration
 
 import java.net.URL
+import scala.compiletime.uninitialized
 
 /**
  * @author chaostone
@@ -35,11 +36,11 @@ import java.net.URL
 class EhCacheManager(val name: String = "ehcache", autoCreate: Boolean = false)
   extends AbstractCacheManager(autoCreate), Initializing {
 
-  var configUrl: URL = _
+  var configUrl: URL = uninitialized
 
-  private var xmlConfig: XmlConfiguration = _
+  private var xmlConfig: XmlConfiguration = uninitialized
 
-  private var innerManager: org.ehcache.CacheManager = _
+  private var innerManager: org.ehcache.CacheManager = uninitialized
 
   def init(): Unit = {
     assert(null != name)
@@ -54,7 +55,7 @@ class EhCacheManager(val name: String = "ehcache", autoCreate: Boolean = false)
         xmlConfig = new XmlConfiguration(configUrl)
         CacheManagerBuilder.newCacheManager(xmlConfig)
       } else {
-        val config = new DefaultConfiguration(null.asInstanceOf[ClassLoader], Array.empty[ServiceCreationConfiguration[_, _]]: _*)
+        val config = new DefaultConfiguration(null.asInstanceOf[ClassLoader], Array.empty[ServiceCreationConfiguration[?, ?]]*)
         CacheManagerBuilder.newCacheManager(config)
       }
     innerManager.init()

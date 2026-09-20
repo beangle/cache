@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
  */
 class ConcurrentMapCacheManager(val name: String = "concurrent") extends CacheManager {
 
-  private var caches = Map.empty[String, ConcurrentMapCache[_, _]]
+  private var caches = Map.empty[String, ConcurrentMapCache[?, ?]]
   private val rwLock = new ReentrantReadWriteLock()
 
   override def getCache[K, V](name: String, keyType: Class[K], valueType: Class[V]): Cache[K, V] = {

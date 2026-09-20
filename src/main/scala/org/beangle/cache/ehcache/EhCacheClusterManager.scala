@@ -22,6 +22,7 @@ import org.beangle.commons.bean.Initializing
 import org.beangle.commons.cache.Cache
 import org.ehcache.config.builders.CacheEventListenerConfigurationBuilder
 import org.ehcache.event.EventType
+import scala.compiletime.uninitialized
 
 /**
  * @author chaostone
@@ -32,7 +33,7 @@ class EhCacheClusterManager(ehManager: EhCacheManager, broadcasterBuilder: Broad
 
   var propagateExpiration: Boolean = false
 
-  private var broadcaster: Broadcaster = _
+  private var broadcaster: Broadcaster = uninitialized
 
   def init(): Unit = {
     broadcaster = broadcasterBuilder.build(ehManager.name, this)
@@ -43,7 +44,7 @@ class EhCacheClusterManager(ehManager: EhCacheManager, broadcasterBuilder: Broad
     if (null == c) {
       var builder = ehManager.getConfigBuilder(name + ".Template", keyType, valueType)
       val eventTypes = new java.util.HashSet[EventType]
-      eventTypes.addAll(java.util.Arrays.asList(EventType.values: _*))
+      eventTypes.addAll(java.util.Arrays.asList(EventType.values*))
       if (!propagateExpiration) eventTypes.remove(EventType.EXPIRED)
 
       val broadcasterConfig = CacheEventListenerConfigurationBuilder
