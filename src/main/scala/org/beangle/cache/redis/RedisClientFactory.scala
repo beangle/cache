@@ -32,15 +32,14 @@ object RedisClientFactory {
     val database = getProperty(props, "database", 0)
 
     val clientConfig = DefaultJedisClientConfig.builder().password(password)
-      .database(0)
-      .timeoutMillis(2000)
+      .database(database)
+      .timeoutMillis(timeout)
       .user(user)
-      .password(password)
       .build()
 
     val poolConfig = new ConnectionPoolConfig
-    poolConfig.setMaxIdle(getProperty(props, "minIdle", 2))
-    poolConfig.setMinIdle(getProperty(props, "maxIdle", 5))
+    poolConfig.setMaxIdle(getProperty(props, "maxIdle", 5))
+    poolConfig.setMinIdle(getProperty(props, "minIdle", 2))
     poolConfig.setMaxTotal(getProperty(props, "maxTotal", 50))
 
     val builder = RedisClient.builder()

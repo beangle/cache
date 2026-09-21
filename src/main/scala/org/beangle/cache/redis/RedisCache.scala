@@ -20,6 +20,7 @@ package org.beangle.cache.redis
 import org.beangle.cache.redis.RedisCache.buildKey
 import org.beangle.commons.cache.Cache
 import org.beangle.commons.io.BinarySerializer
+import org.beangle.commons.lang.Objects
 import redis.clients.jedis.RedisClient
 import redis.clients.jedis.params.SetParams
 
@@ -52,7 +53,6 @@ class RedisCache[K, V](name: String, client: RedisClient, serializer: BinarySeri
 
   override def putIfAbsent(key: K, value: V): Boolean = {
     setBytes(buildKey(name, key).getBytes, serializer.asBytes(value), ifAbsent = true)
-    false
   }
 
   override def touch(key: K): Boolean = {
@@ -62,14 +62,18 @@ class RedisCache[K, V](name: String, client: RedisClient, serializer: BinarySeri
   def replace(key: K, value: V): Option[V] = {
     val redisKey = buildKey(name, key).getBytes
     val o = client.get(redisKey)
-    setBytes(redisKey, serializer.asBytes(value))
-    if (o == null) None else Some(serializer.asBytes(o).asInstanceOf[V])
+    if (o == null) {
+      None
+    } else {
+      setBytes(redisKey, serializer.asBytes(value))
+      Some(serializer.asObject(vtype, o))
+    }
   }
 
   def replace(key: K, oldvalue: V, newvalue: V): Boolean = {
     val redisKey = buildKey(name, key).getBytes
     val o = client.get(redisKey)
-    if (o != null && o == serializer.asBytes(oldvalue)) {
+    if (o != null && Objects.equals(oldvalue, serializer.asObject(vtype, o))) {
       setBytes(redisKey, serializer.asBytes(newvalue))
       true
     } else {
@@ -103,15 +107,16 @@ class RedisCache[K, V](name: String, client: RedisClient, serializer: BinarySeri
    * @param key Redis 键
    * @param value 要写入的二进制值
    * @param ifAbsent 为 true 时仅当 key 不存在才写入（对应 Redis SET NX）
+   * @return 写入成功为 true；带 `ifAbsent` 且 key 已存在（Redis 返回 nil）时为 false
    */
-  private def setBytes(key: Array[Byte], value: Array[Byte], ifAbsent: Boolean = false): Unit = {
+  private def setBytes(key: Array[Byte], value: Array[Byte], ifAbsent: Boolean = false): Boolean = {
     if (ifAbsent || ttl > 0) {
       var params = SetParams.setParams()
       if (ifAbsent) params = params.nx()
       if (ttl > 0) params = params.ex(ttl)
-      client.set(key, value, params)
+      client.set(key, value, params) != null
     } else {
-      client.set(key, value)
+      client.set(key, value) != null
     }
   }
 }
